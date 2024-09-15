@@ -1,0 +1,302 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'includes/head.html' %}
+
+    <!-- Include jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include Select2 CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+    {% include 'includes/header.html' %}
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+    {% include 'includes/side_nav.html' %}
+  </aside><!-- End Sidebar -->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Edit Treasury Bill</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Branch</a></li>
+          <li class="breadcrumb-item active">Treasury Bill</li>
+          <li class="breadcrumb-item active">Edit</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <form method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+
+                <div class="col-md-12">
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            There were errors with your submission. Please correct them and try again.
+                        </div>
+                    {% endif %}
+
+                    {% for message in messages %}
+                        <div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
+                    {% endfor %}
+                    
+                    <h6 class="p-2 bg-dark text-light"><i class="ms-2 me-2 bi bi-info-circle-fill"></i>T-Bill Details</h6>
+                    <div class="row p-3">
+
+                        <!-- Transaction Code -->
+                        <div class="col-md-2 mb-3">
+                            <label for="{{ form.transaction_code.id_for_label }}" class="form-label">{{ form.transaction_code.label }}</label>
+                            {{ form.transaction_code|add_class:"form-control" }}
+                            {% if form.transaction_code.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.transaction_code.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Branch Purchased At -->
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.branch_purchased_at.id_for_label }}" class="form-label">{{ form.branch_purchased_at.label }}</label>
+                            {{ form.branch_purchased_at|add_class:"form-select" }}
+                            {% if form.branch_purchased_at.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.branch_purchased_at.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Account Domicile Branch -->
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.account_domicile_branch.id_for_label }}" class="form-label">{{ form.account_domicile_branch.label }}</label>
+                            {{ form.account_domicile_branch|add_class:"form-control" }}
+                            {% if form.account_domicile_branch.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.account_domicile_branch.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    
+                        <!-- Account Number -->
+                        <div class="col-md-12 mb-3">
+                            <label for="{{ form.account_number.id_for_label }}" class="form-label">{{ form.account_number.label }}</label>
+                            {{ form.account_number|add_class:"form-control" }}
+                            {% if form.account_number.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.account_number.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Currency -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.currency.id_for_label }}" class="form-label">{{ form.currency.label }}</label>
+                            {{ form.currency|add_class:"form-control" }}
+                            {% if form.currency.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.currency.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Customer Amount -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.customer_amount.id_for_label }}" class="form-label">{{ form.customer_amount.label }}</label>
+                            {{ form.customer_amount|add_class:"form-control" }}
+                            {% if form.customer_amount.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.customer_amount.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+						
+						<!-- LCY Amount -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.lcy_amount.id_for_label }}" class="form-label">{{ form.lcy_amount.label }}</label>
+                            {{ form.lcy_amount|add_class:"form-control" }}
+                            {% if form.lcy_amount.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.lcy_amount.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+						<!-- Face Value -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.face_value.id_for_label }}" class="form-label">{{ form.face_value.label }}</label>
+                            {{ form.face_value|add_class:"form-control" }}
+                            {% if form.face_value.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.face_value.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>						
+						
+						<!-- Tenor -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.tenor.id_for_label }}" class="form-label">{{ form.tenor.label }}</label>
+                            {{ form.tenor|add_class:"form-control" }}
+                            {% if form.tenor.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.tenor.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+						
+						<!-- Maturity Instruction -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.maturity_instruction.id_for_label }}" class="form-label">{{ form.maturity_instruction.label }}</label>
+                            {{ form.maturity_instruction|add_class:"form-control" }}
+                            {% if form.maturity_instruction.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.maturity_instruction.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Interest Rate -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.interest_rate.id_for_label }}" class="form-label">{{ form.interest_rate.label }}</label>
+                            {{ form.interest_rate|add_class:"form-control" }}
+                            {% if form.interest_rate.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.interest_rate.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Discount Rate -->
+                        <div class="col-md-3 mb-3">
+                            <label for="{{ form.discount_rate.id_for_label }}" class="form-label">{{ form.discount_rate.label }}</label>
+                            {{ form.discount_rate|add_class:"form-control" }}
+                            {% if form.discount_rate.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.discount_rate.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Issue Date -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.issue_date.id_for_label }}" class="form-label">{{ form.issue_date.label }}</label>
+                            {{ form.issue_date|add_class:"form-control" }}
+                            {% if form.issue_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.issue_date.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Maturity Date -->
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.maturity_date.id_for_label }}" class="form-label">{{ form.maturity_date.label }}</label>
+                            {{ form.maturity_date|add_class:"form-control" }}
+                            {% if form.maturity_date.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.maturity_date.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+						
+						<h6 class="p-2 bg-dark text-light"><i class="ms-2 me-2 bi bi-info-circle-fill"></i>Roll Over Instruction</h6>
+
+                        <!-- Roll Over Instruction -->
+                        <div class="col-md-2 mb-3">
+                            <label for="{{ form.roll_over_instruction.id_for_label }}" class="form-label">{{ form.roll_over_instruction.label }}</label>
+                            {{ form.roll_over_instruction|add_class:"form-control" }}
+                            {% if form.roll_over_instruction.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.roll_over_instruction.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Comment -->
+                        <div class="col-md-10 mb-3">
+                            <label for="{{ form.comment.id_for_label }}" class="form-label">{{ form.comment.label }}</label>
+                            {{ form.comment|add_class:"form-control" }}
+                            {% if form.comment.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.comment.errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+
+
+						 {{ form.account_domicile_branch_hidden }}
+							{{ form.account_number_hidden }}
+							{{ form.currency_hidden }}
+							{{ form.maturity_instruction_hidden }}
+                      
+
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                    
+                </div>
+            
+            </div>
+            
+        </form>
+    </section>
+  </main><!-- End #main -->
+
+   {% include 'includes/footer.html' %}
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  {% include 'includes/script.html' %}
+  
+</body>
+
+</html>

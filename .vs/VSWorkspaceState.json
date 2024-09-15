@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\branch",
+    "\\templates",
+    "\\templates\\branch",
+    "\\templates\\branch\\treasury",
+    "\\treasury"
+  ],
+  "SelectedNode": "\\treasury\\models.py",
+  "PreviewInSolutionExplorer": false
+}

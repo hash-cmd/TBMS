@@ -1,0 +1,98 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'includes/head.html' %}
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+    {% include 'includes/header.html' %}
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+    {% include 'includes/side_nav.html' %}
+  </aside><!-- End Sidebar -->
+
+  <main id="main" class="main p-3">
+
+    <div class="pagetitle">
+      <h1>Withdrawal Information</h1>
+      <nav class="d-flex justify-content-between">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Withdrawals</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="table-container p-3">
+            {% for message in messages %}
+                <div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
+            {% endfor %}
+            <table class="p-3 border-dark table table-hover table-striped table-border datatable">
+                <thead>
+                    <tr>
+                        <th style="font-size: 12px;">Trans Code</th>
+                        <th style="font-size: 12px;">Branch Purchased At</th>
+                        <th style="font-size: 12px;">Account Domicile Branch</th>
+                        <th style="font-size: 12px;">Account Number</th>
+                        <th style="font-size: 12px;">Tenor</th>
+                        <th style="font-size: 12px;">Currency</th>
+                        <th style="font-size: 12px;">Customer Amount</th>
+                        <th style="font-size: 12px;">Maturity Instruction</th>
+                        <th style="font-size: 12px;">LCY Amount</th>
+                        <th style="font-size: 12px;">Interest Rate</th>
+                        <th style="font-size: 12px;">Discount Rate</th>
+                        <th style="font-size: 12px;">Face Value</th>
+                        <th style="font-size: 12px;">Issue Date</th>
+                        <th style="font-size: 12px;">Maturity Date</th>
+                        <th style="font-size: 12px;">Roll Over Instruction</th>
+                        <th style="font-size: 12px;">Authorized By</th>
+                        <th style="font-size: 12px;">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for withdrawal in withdrawals %}
+                    <tr class="text-center">
+                        <td style="font-size: 12px;" class="text-dark">{{ withdrawal.transaction_code }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.branch_purchased_at }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.account_domicile_branch }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.account_number }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.tenor }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.currency }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.customer_amount }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.maturity_instruction }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.lcy_amount }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.interest_rate }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.discount_rate }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.face_value }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.issue_date }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.maturity_date }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.roll_over_instruction }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.created_by }}</td>
+                        <td style="font-size: 12px;">{{ withdrawal.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  {% include 'includes/footer.html' %}
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  {% include 'includes/script.html' %}
+
+</body>
+
+</html>

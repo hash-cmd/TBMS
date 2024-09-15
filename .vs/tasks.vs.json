@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-db",
+      "appliesTo": "db.sqlite3",
+      "type": "launch"
+    }
+  ]
+}

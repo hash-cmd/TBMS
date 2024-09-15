@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{% include 'includes/head.html' %}
+	<style>
+	.dropdown-submenu {
+	  position: relative;
+	}
+
+	.dropdown-submenu .dropdown-menu {
+	  top: 0;
+	  left: -100%; /* Adjust this if necessary to fine-tune */
+	  margin-left: -0.1rem; /* Add space between the submenu and parent */
+	}
+
+	.dropdown-submenu:hover .dropdown-menu {
+	  display: block;
+	}
+	</style>
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+
+    {% include 'includes/header.html' %}
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar" >
+
+    {% include 'includes/side_nav.html' %}
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main p-3">
+
+    <div class="pagetitle">
+      <h1>T-Bill Rollover Instruction</h1>
+      <nav class="d-flex justify-content-between">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Branch</a></li>
+		  <li class="breadcrumb-item active">Treasury Bill</li>
+          <li class="breadcrumb-item active">A Week To Maturity</li>
+        </ol>
+
+
+
+		</div>
+
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+		
+				
+
+		<div class="table-container p-3">
+		{% for message in messages %}
+			<div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
+		{% endfor %}
+		  <table class="p-3 border-dark table table-hover table-striped table-border datatable">
+				<thead>
+					<tr >
+					<th style="font-size: 12px;">Trans Code</th>
+					<th style="font-size: 12px;">Initiated At</th>
+					<th style="font-size: 12px;">Domicile Branch</th>
+					<th style="font-size: 12px;">Account Number</th>
+					<th style="font-size: 12px;">Tenor</th>
+					<th style="font-size: 12px;">Currency</th>
+					<th style="font-size: 12px;">Customer Amount</th>
+					<th style="font-size: 12px;">Maturity Instruction</th>
+					<th style="font-size: 12px;">LCY Amount</th>
+					<th style="font-size: 12px;">Interest Rate</th>
+					<th style="font-size: 12px;">Discount Rate</th>
+					<th style="font-size: 12px;">Face Value</th>
+					<th style="font-size: 12px;">Issue Date</th>
+					<th style="font-size: 12px;">Maturity Date</th>
+					<th style="font-size: 12px;">Status</th>
+					<th style="font-size: 12px;">Action</th>
+					</tr>
+
+				</thead>
+				<tbody>
+					{% for treasury_bill in all_treasury_bills %}
+					<tr class="text-center">
+						<td style="font-size: 12px;" class="text-dark">{{ treasury_bill.transaction_code }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.branch_purchased_at }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.account_domicile_branch }}</td>
+						<td style="font-size: 12px;">
+							<a href="#">
+								{{ treasury_bill.account_number.account_number }}
+							</a>
+						</td>
+						<td style="font-size: 12px;">{{ treasury_bill.tenor }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.currency.currency_sign }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.customer_amount }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.maturity_instruction }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.lcy_amount }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.interest_rate }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.discount_rate }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.face_value }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.issue_date }}</td>
+						<td style="font-size: 12px;">{{ treasury_bill.maturity_date }}</td>
+						
+						<td style="font-size: 12px;">
+							{% if treasury_bill.status == '0' %}
+								<div class="alert alert-danger p-1">Inactive</div>
+							{% elif treasury_bill.status == '1' %}
+								<div class="alert alert-success p-1">Inactive</div>
+							{% endif %}
+						</td>
+						<td>
+						  <div class="btn-group">
+							<button type="button" class="btn btn-sm btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+							  Action
+							</button>
+							<ul class="dropdown-menu">
+							  <!-- Rollover with dropstart submenu -->
+							  <li class="dropdown-submenu">
+								<a class="dropdown-item text-success d-flex align-items-center" href="#" style="line-height: 1.5;">
+								  Rollover
+								</a>
+								<ul class="dropdown-menu dropdown-menu-start">
+								  <li><a class="dropdown-item" href="/branch/treasury-bill/roll-over-with-interest/{{treasury_bill.slug}}" type="button">Roll - Over with Interest on Maturity</a></li>
+								  <li><a class="dropdown-item"  href="/branch/treasury-bill/roll-over-principal/{{treasury_bill.slug}}"  type="button">Roll - Over Principal only on Maturity</a></li>
+								</ul>
+							  </li>
+							  <!-- Do Not Rollover -->
+							  <li>
+								<a class="dropdown-item d-flex align-items-center" href="/branch/treasury-bill/do-not-roll-over/{{treasury_bill.slug}}" style="line-height: 1.5;">
+								  Do Not Rollover
+								</a>
+							  </li>
+							  <!-- Terminate -->
+							  <li>
+								<a class="dropdown-item text-danger d-flex align-items-center" href="/branch/treasury-bill/terminate/{{treasury_bill.slug}}" style="line-height: 1.5;">
+								  Terminate
+								</a>
+							  </li>
+							</ul>
+						  </div>
+						</td>
+
+
+
+
+
+					</tr>
+
+					{% endfor %}
+			</tbody>
+		  </table>
+		</div>
+		
+    </section>
+	
+
+
+
+	
+
+  </main><!-- End #main -->
+
+ {% include 'includes/footer.html'%}
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  
+  {% include 'includes/script.html' %}
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.dropdown-submenu > a').forEach(function(element) {
+    element.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Close other submenus
+      document.querySelectorAll('.dropdown-submenu .dropdown-menu').forEach(function(submenu) {
+        if (submenu !== this.nextElementSibling) {
+          submenu.classList.remove('show');
+        }
+      }.bind(this));
+      
+      // Toggle the submenu
+      if (this.nextElementSibling) {
+        this.nextElementSibling.classList.toggle('show');
+      }
+    });
+  });
+
+  // Close submenu when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown-submenu')) {
+      document.querySelectorAll('.dropdown-submenu .dropdown-menu').forEach(function(submenu) {
+        submenu.classList.remove('show');
+      });
+    }
+  });
+});
+
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block Login%}
+  <main class="main-content mt-0" style="background-image: url(static/assets/img/bg-front.jpg); background-size: cover; background-repeat:no-repeat;">
+    <section>
+      <div class="page-header min-vh-100">
+        <div class="container">
+          <div class="row justify-content-center align-items-center">
+            <div class="col-xl-7 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+              <div class="card card-plain bg-white shadow-lg shadow-white">
+                <div class="card-header pb-0 text-center">
+                  <div class="">
+                    <img src="{% static 'assets/img/logos/omnibsic_bank_logo.png' %}" class="img-fluid">
+                    <div class="mt-5">
+                      <h3>Treasury Bill Management </h3><h3>System</h3>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4 mb-4 card-body text-center ">
+                 <a href="{% provider_login_url 'microsoft' %}"  style="background-color: #0468BF;" class="btn text-white mb-0 w-30">Sign In</a>
+                </div>
+
+                </div>
+              </div>
+            </div>
+        </div>
+
+    </section>
+  </main>
+  {% endblock Login %}
+  <!--   Core JS Files   -->

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{% include 'includes/head.html' %}
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+
+    {% include 'includes/header.html' %}
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar" >
+
+    {% include 'includes/side_nav.html' %}
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main p-3">
+
+    <div class="pagetitle">
+      <h1>Currency Information</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Treasury</a></li>
+          <li class="breadcrumb-item active">Currency</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+	
+
+      <div class="row">
+
+        <!-- Left side columns -->
+        <div class="col-lg-8">
+          <div class="row">
+
+            <!-- Sales Card -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card sales-card">
+
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                </div>
+
+                <div class="card-body">
+                  <h5 class="card-title">Total Currencies</h5>
+
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-currency-exchange"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6>{{all_currency_count}}</h6>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- End Sales Card -->
+		
+          </div>
+        </div><!-- End Left side columns -->
+		
+		<div class="row">
+		{% if messages %}
+			<ul class="messages">
+				{% for message in messages %}
+					<li class="p-2 bg-info w-100 { message.tags }}">{{ message }}</li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+		<div class="col-5">
+              <div class="card recent-sales overflow-auto">
+
+                <div class="card-body">
+				<form action="" method="POST">
+					{% csrf_token %}
+					<div class="d-flex justify-content-between align-items-center">
+					   <h5 class="card-title">Branch <span>| New</span></h5> 
+						
+					</div>
+					<div class="d-flex align-items-center">
+						<div class="col-md-5">
+							<label for="id_currency_sign" class="fs-6 fw-bolder p-2">{{ form.currency_sign.label }}</label>
+							{{form.currency_sign}}
+							<div class="text-danger">{{ form.currency_sign.errors }}</div>
+						</div>
+						<div class="col-md-7 p-2">
+							<label for="id_currency_name" class="fs-6 fw-bolder p-2">{{ form.currency_name.label }}</label>
+							{{form.currency_name}}
+							<div class="text-danger">{{ form.currency_name.errors }}</div>
+						</div>
+					</div>
+					<div class="mt-3 ms-2 me-3">
+						<button class="p-2 btn btn-primary">Add Currency</button>
+					</div>
+				   </form>
+                 
+                </div>
+
+              </div>
+            </div><!-- End Recent Sales -->
+			
+			
+			<div class="col-7">
+              <div class="card recent-sales overflow-auto">
+                <div class="card-body">
+                  <h5 class="card-title">Available Currencies</h5>
+
+				<table class="table table-hover table-stripe table-borderless datatable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Currency Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+					{% for currency in all_currency %}
+                      <tr>
+                        <th scope="row"><a href="#">{{currency.currency_sign}}</a></th>
+                        <td>{{currency.currency_name}}</td>
+                      </tr>
+					{% endfor %}
+                    </tbody>
+                  </table>
+					
+                </div>
+
+              </div>
+            </div><!-- End Recent Sales -->
+		
+		</div>
+
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+
+      Designed by <a href="">BootstrapMade</a>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  
+  
+  {% include 'includes/script.html' %}
+
+</body>
+
+</html>

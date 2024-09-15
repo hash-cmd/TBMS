@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{% include 'includes/head.html' %}
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+
+    {% include 'includes/header.html' %}
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar" >
+
+    {% include 'includes/side_nav.html' %}
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main p-3">
+
+    <div class="pagetitle">
+      <h1>Customers Informations</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Branch</a></li>
+          <li class="breadcrumb-item active">Treasury Bill</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+	  
+	  
+		 <div class="col-xl-12">
+
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+			  <div class="d-flex justify-content-between align-items-center p-3">
+			  
+				
+			  
+				<ul class=" nav nav-tabs nav-tabs-bordered">
+
+					<li class="nav-item">
+					  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">All Customers</button>
+					</li>
+
+					<li class="nav-item">
+					  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">With CSD</button>
+					</li>
+
+					<li class="nav-item">
+					  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings">Without CSD</button>
+					</li>
+
+				</ul>
+				
+				<div class="me-5">
+					<button style="font-size: 14px;" class="me-1 border-1 btn-secondary p-1">CSV</button>
+					<button style="font-size: 14px;" class="border-1 btn-secondary p-1">Excel</button>
+				</div>
+				
+			</div>
+              <div class="tab-content pt-2">
+
+                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+					<div class="table-container">
+					  <table class="table table-hover table-striped table-border datatable">
+							<thead >
+								<tr >
+									<th style="font-size: 12px;">Title</th>
+									<th style="font-size: 12px;">Surname/Company Name</th>
+									<th style="font-size: 12px;">Other Names</th>
+									<th style="font-size: 12px;">Date of Registry</th>
+									<th style="font-size: 12px;">Nationality</th>
+									<th style="font-size: 12px;">Occupation</th>
+									<th style="font-size: 12px;">Address</th>
+									<th style="font-size: 12px;">Residential Address</th>
+									<th style="font-size: 12px;">Residential Status</th>
+									<th style="font-size: 12px;">Phone Number</th>
+									<th style="font-size: 12px;">Fax Number</th>
+									<th style="font-size: 12px;">Email</th>
+									<th style="font-size: 12px;">ID Type</th>
+									<th style="font-size: 12px;">ID Number</th>
+									<th style="font-size: 12px;">Place of Issue</th>
+									<th style="font-size: 12px;">Expiry Date</th>
+									<th style="font-size: 12px;">Account Number</th>
+									<th style="font-size: 12px;">Account Branch</th>
+									<th style="font-size: 12px;">CSD Number</th>
+									<th style="font-size: 12px;">Action</th>
+								</tr>
+
+							</thead>
+					<tbody>
+						{% for customer in all_custumers %}
+						<tr >
+							<td style="font-size: 12px;" class="text-dark">{{ customer.title }}</td>
+							<td style="font-size: 12px;" class="text-dark">{{ customer.surname_or_company_name }}</td>
+							<td style="font-size: 12px;">{{ customer.other_names }}</td>
+							<td style="font-size: 12px;">{{ customer.date_of_birth_or_incorporation_of_business }}</td>
+							<td style="font-size: 12px;">{{ customer.nationality }}</td>
+							<td style="font-size: 12px;">{{ customer.occupation }}</td>
+							<td style="font-size: 12px;">{{ customer.address }}</td>
+							<td style="font-size: 12px;">{{ customer.residential_address }}</td>
+							<td style="font-size: 12px;">{{ customer.residential_status }}</td>
+							<td style="font-size: 12px;">{{ customer.phone_number }}</td>
+							<td style="font-size: 12px;">{{ customer.fax_number }}</td>
+							<td style="font-size: 12px;">{{ customer.email }}</td>
+							<td style="font-size: 12px;">{{ customer.id_type }}</td>
+							<td style="font-size: 12px;">{{ customer.id_number }}</td>
+							<td style="font-size: 12px;">{{ customer.place_of_issue }}</td>
+							<td style="font-size: 12px;">{{ customer.expiry_date }}</td>
+							<td style="font-size: 12px;">{{ customer.account_number }}</td>
+							<td style="font-size: 12px;">{{ customer.account_branch }}</td>
+							<td style="font-size: 12px;">{{ customer.csd_number }}</td>
+							<td>
+								<div class="btn-group">
+								  <button type="button" class="btn btn-sm btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+									Action
+								  </button>
+								  <ul class="dropdown-menu">
+									<li><a class="dropdown-item" href="#">Edit</a></li>
+									<li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+									<li><hr class="dropdown-divider"></li>
+									<li>
+										<a class="dropdown-item d-flex align-items-center" href="#" style="line-height: 1.5;">
+											<i class="bi bi-cloud-download"></i>Download
+										</a>
+									</li>
+
+								  </ul>
+								</div>
+							</td>
+						</tr>
+
+						{% endfor %}
+					</tbody>
+				  </table>
+					</div>
+                </div>
+
+                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+					<div class="table-container">
+						<table class="table table-hover table-striped table-borderless datatable">
+							<thead>
+								<tr>
+									<th style="font-size: 12px;">Title</th>
+									<th style="font-size: 12px;">Surname/Company Name</th>
+									<th style="font-size: 12px;">Other Names</th>
+									<th style="font-size: 12px;">Date of Registry</th>
+									<th style="font-size: 12px;">Nationality</th>
+									<th style="font-size: 12px;">Occupation</th>
+									<th style="font-size: 12px;">Address</th>
+									<th style="font-size: 12px;">Residential Address</th>
+									<th style="font-size: 12px;">Residential Status</th>
+									<th style="font-size: 12px;">Phone Number</th>
+									<th style="font-size: 12px;">Fax Number</th>
+									<th style="font-size: 12px;">Email</th>
+									<th style="font-size: 12px;">ID Type</th>
+									<th style="font-size: 12px;">ID Number</th>
+									<th style="font-size: 12px;">Place of Issue</th>
+									<th style="font-size: 12px;">Expiry Date</th>
+									<th style="font-size: 12px;">Account Number</th>
+									<th style="font-size: 12px;">Account Branch</th>
+									<th style="font-size: 12px;">CSD Number</th>
+								</tr>
+
+							</thead>
+							<tbody>
+								{% for with_csd in all_with_csd %}
+								<tr>
+									<td style="font-size: 12px;">{{ with_csd.title }}</td>
+									<td style="font-size: 12px;">{{ with_csd.surname_or_company_name }}</td>
+									<td style="font-size: 12px;">{{ with_csd.other_names }}</td>
+									<td style="font-size: 12px;">{{ with_csd.date_of_birth_or_incorporation_of_business }}</td>
+									<td style="font-size: 12px;">{{ with_csd.nationality }}</td>
+									<td style="font-size: 12px;">{{ with_csd.occupation }}</td>
+									<td style="font-size: 12px;">{{ with_csd.address }}</td>
+									<td style="font-size: 12px;">{{ with_csd.residential_address }}</td>
+									<td style="font-size: 12px;">{{ with_csd.residential_status }}</td>
+									<td style="font-size: 12px;">{{ with_csd.phone_number }}</td>
+									<td style="font-size: 12px;">{{ with_csd.fax_number }}</td>
+									<td style="font-size: 12px;">{{ with_csd.email }}</td>
+									<td style="font-size: 12px;">{{ with_csd.id_type }}</td>
+									<td style="font-size: 12px;">{{ with_csd.id_number }}</td>
+									<td style="font-size: 12px;">{{ with_csd.place_of_issue }}</td>
+									<td style="font-size: 12px;">{{ with_csd.expiry_date }}</td>
+									<td style="font-size: 12px;">{{ with_csd.account_number }}</td>
+									<td style="font-size: 12px;">{{ with_csd.account_branch }}</td>
+									<td style="font-size: 12px;">{{ with_csd.csd_number }}</td>
+								</tr>
+
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+                </div>
+
+                <div class="tab-pane fade pt-3" id="profile-settings">
+
+					 <div class="table-container">
+						<table class="table table-hover table-striped table-borderless datatable">
+							<thead>
+								<tr>
+									<th style="font-size: 12px;">Title</th>
+									<th style="font-size: 12px;">Surname/Company Name</th>
+									<th style="font-size: 12px;">Other Names</th>
+									<th style="font-size: 12px;">Date of Registry</th>
+									<th style="font-size: 12px;">Nationality</th>
+									<th style="font-size: 12px;">Occupation</th>
+									<th style="font-size: 12px;">Address</th>
+									<th style="font-size: 12px;">Residential Address</th>
+									<th style="font-size: 12px;">Residential Status</th>
+									<th style="font-size: 12px;">Phone Number</th>
+									<th style="font-size: 12px;">Fax Number</th>
+									<th style="font-size: 12px;">Email</th>
+									<th style="font-size: 12px;">ID Type</th>
+									<th style="font-size: 12px;">ID Number</th>
+									<th style="font-size: 12px;">Place of Issue</th>
+									<th style="font-size: 12px;">Expiry Date</th>
+									<th style="font-size: 12px;">Account Number</th>
+									<th style="font-size: 12px;">Account Branch</th>
+									<th style="font-size: 12px;">CSD Number</th>
+									
+								</tr>
+							</thead>
+							<tbody>
+								{% for without_csd in all_without_csd %}
+								<tr>
+									<td style="font-size: 12px;">{{ without_csd.title }}</td>
+									<td style="font-size: 12px;">{{ without_csd.surname_or_company_name }}</td>
+									<td style="font-size: 12px;">{{ without_csd.other_names }}</td>
+									<td style="font-size: 12px;">{{ without_csd.date_of_birth_or_incorporation_of_business }}</td>
+									<td style="font-size: 12px;">{{ without_csd.nationality }}</td>
+									<td style="font-size: 12px;">{{ without_csd.occupation }}</td>
+									<td style="font-size: 12px;">{{ without_csd.address }}</td>
+									<td style="font-size: 12px;">{{ without_csd.residential_address }}</td>
+									<td style="font-size: 12px;">{{ without_csd.residential_status }}</td>
+									<td style="font-size: 12px;">{{ without_csd.phone_number }}</td>
+									<td style="font-size: 12px;">{{ without_csd.fax_number }}</td>
+									<td style="font-size: 12px;">{{ without_csd.email }}</td>
+									<td style="font-size: 12px;">{{ without_csd.id_type }}</td>
+									<td style="font-size: 12px;">{{ without_csd.id_number }}</td>
+									<td style="font-size: 12px;">{{ without_csd.place_of_issue }}</td>
+									<td style="font-size: 12px;">{{ without_csd.expiry_date }}</td>
+									<td style="font-size: 12px;">{{ without_csd.account_number }}</td>
+									<td style="font-size: 12px;">{{ without_csd.account_branch }}</td>
+									<td style="font-size: 12px;">{{ without_csd.csd_number }}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+
+                </div>
+
+                <div class="tab-pane fade pt-3" id="profile-change-password">
+                  <!-- Change Password Form -->
+                
+                </div>
+
+              </div><!-- End Bordered Tabs -->
+
+            </div>
+          </div>
+
+        </div>
+
+   
+	  
+    </section>
+	
+	
+	
+	
+	<!-- Button trigger modal -->
+	
+
+	
+	
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="copyright">
+      &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+    </div>
+    <div class="credits">
+
+      Designed by <a href="">BootstrapMade</a>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  
+  
+  {% include 'includes/script.html' %}
+
+</body>
+
+</html>

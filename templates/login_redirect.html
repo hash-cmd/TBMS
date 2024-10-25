@@ -6,11 +6,11 @@
 		{% if request.user.department == 'branch' %}
 			<a href="/branch/" class="">Click to Redirect</a>
 		{% elif request.user.department == 'treasury' %}
-			<a href="/treasury/dashboard">Click to Redirect</a>
-		{% elif request.user.department == 'treasury' %}
-			<a href="/Tro_Ops/dashboard">Click to Redirect</a>
-		{% elif request.user.department == 'Admin' %}
-			<a href="/Admin/home">Click to Redirect</a>
+			<a href="/treasury/">Click to Redirect</a>
+		{% elif request.user.department == 'trops' %}
+			<a href="/trops/">Click to Redirect</a>
+		{% elif request.user.department == 'admin' %}
+			<a href="/super/users/all/">Click to Redirect</a>
 		{% else %}
 			<p>Kindly contact your administrator</p>
 		{% endif %}

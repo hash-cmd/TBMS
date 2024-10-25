@@ -1,3 +1,5 @@
+{% if request.user.department == 'treasury' %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,12 +16,7 @@
 
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar" >
-
     {% include 'includes/side_nav.html' %}
-
-  </aside><!-- End Sidebar-->
 
   <main id="main" class="main p-3">
 
@@ -58,16 +55,17 @@
 		
 				
 
-		<div class="table-container p-3">
+		<div class="table-container p-3 shadow rounded border border-dark border-1">
 		{% for message in messages %}
-					<div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
-				{% endfor %}
+			<div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
+		{% endfor %}
 		  <table class="p-3 border-dark table table-hover table-striped table-border datatable">
 				<thead>
 					<tr >
 					<th style="font-size: 12px;">Trans Code</th>
 					<th style="font-size: 12px;">Initiated At</th>
 					<th style="font-size: 12px;">Domicile Branch</th>
+    				<th style="font-size: 12px;">Account Name</th>
 					<th style="font-size: 12px;">Account Number</th>
 					<th style="font-size: 12px;">Tenor</th>
 					<th style="font-size: 12px;">Currency</th>
@@ -80,7 +78,7 @@
 					<th style="font-size: 12px;">Issue Date</th>
 					<th style="font-size: 12px;">Maturity Date</th>
 					<th style="font-size: 12px;">Status</th>
-					<th style="font-size: 12px;">Action</th>
+					<!--<th style="font-size: 12px;">Action</th>-->
 					</tr>
 
 				</thead>
@@ -92,13 +90,26 @@
 						<td style="font-size: 12px;">{{ treasury_bill.account_domicile_branch }}</td>
 						<td style="font-size: 12px;">
 							<a href="#">
+								{{ treasury_bill.account_number }}
+							</a>
+						</td>
+            <td style="font-size: 12px;">
+							<a href="#">
 								{{ treasury_bill.account_number.account_number }}
 							</a>
 						</td>
 						<td style="font-size: 12px;">{{ treasury_bill.tenor }}</td>
 						<td style="font-size: 12px;">{{ treasury_bill.currency.currency_sign }}</td>
 						<td style="font-size: 12px;">{{ treasury_bill.customer_amount }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.maturity_instruction }}</td>
+						<td style="font-size: 12px;">
+							{% if treasury_bill.maturity_instruction == 1 %}
+							<p>Pay Principal & Interest on Maturity</p>
+							{% elif treasury_bill.maturity_instruction == 2 %}
+							<p>Roll - Over with interest on Maturity</p>
+							{% elif treasury_bill.maturity_instruction == 3 %}
+							<p>Roll - Over Principal only on Maturity</p>
+							{% endif %}
+						</td>
 						<td style="font-size: 12px;">{{ treasury_bill.lcy_amount }}</td>
 						<td style="font-size: 12px;">{{ treasury_bill.interest_rate }}</td>
 						<td style="font-size: 12px;">{{ treasury_bill.discount_rate }}</td>
@@ -110,18 +121,18 @@
 							{% if treasury_bill.status == '0' %}
 								<div class="alert alert-danger p-1">Inactive</div>
 							{% elif treasury_bill.status == '1' %}
-								<div class="alert alert-success p-1">Inactive</div>
+								<div class="alert alert-success p-1">active</div>
 							{% endif %}
 						</td>
+						<!--
 						<td>
 							<div class="btn-group">
 								<button type="button" class="btn btn-sm btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 									Action
 								</button>
 								<ul class="dropdown-menu">
-								
+									{% if treasury_bill.status == '0' %}
 									<li><a class="dropdown-item" href="#" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Approve</a></li>
-									<li><a class="dropdown-item" href="#">Edit</a></li>
 									<li>
 									  <a class="dropdown-item text-danger" href="#" 
 										 data-bs-toggle="modal" 
@@ -134,19 +145,21 @@
 										<li><hr class="dropdown-divider"></li>
 									
 									<li>
-										<a class="dropdown-item d-flex align-items-center" href="{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
-											<i class="bi bi-cloud-download"></i> Download
+										<a class="dropdown-item d-flex align-items-center" href="/treasury{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
+											<i class="bi bi-eye"></i> View
 										</a>
 									</li>
+									{% elif treasury_bill.status == '1' %}
 									<li>
-										<a class="dropdown-item d-flex align-items-center" href="{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
-											<i class="bi bi-printer"></i> Print
+										<a class="dropdown-item d-flex align-items-center" href="/treasury{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
+											<i class="bi bi-eye"></i> View
 										</a>
 									</li>
+									{% endif %}
 								</ul>
 							</div>
 						</td>
-
+					-->
 					</tr>
 
 					{% endfor %}
@@ -168,91 +181,48 @@
       </div>
       <div class="modal-body">
         <form id="treasuryBillForm" class="row">
-			<div class="col-md-3">
+			
+			<div class="col-md-12">
 			  <div class="mb-3">
 				<label for="transactionCode" class="form-label">Transaction Code</label>
-				<input type="text" class="form-control" id="transactionCode" name="transaction_code" readonly>
+				<input type="text" class="form-control" id="transactionCode" name="transaction_code">
 			  </div>
 			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="branchPurchasedAt" class="form-label">Branch Purchased At</label>
-				<input type="text" class="form-control" id="branchPurchasedAt" name="branch_purchased_at" readonly>
-			  </div>
+			
+			<div class="col-md-12">
+			   <div class="mb-3">
+				   <label for="tenor" class="form-label">Tenor</label>
+				   <input type="text" class="form-control" id="tenor" name="tenor" readonly>
+			   </div>
 			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="accountDomicileBranch" class="form-label">Domicile Branch</label>
-				<input type="text" class="form-control" id="accountDomicileBranch" name="account_domicile_branch" readonly>
-			  </div>
-			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="accountNumber" class="form-label">Account Number</label>
-				<input type="text" class="form-control" id="accountNumber" name="account_number" readonly>
-			  </div>
-			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="currency" class="form-label">Currency</label>
-				<input type="text" class="form-control" id="currency" name="currency" readonly>
-			  </div>
-			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="customerAmount" class="form-label">Customer Amount</label>
-				<input type="text" class="form-control" id="customerAmount" name="customer_amount" readonly>
-			  </div>
-			</div>
-			<div class="col-md-2">
+			
+			<div class="col-md-12">
 			  <div class="mb-3">
 				<label for="interestRate" class="form-label">Interest Rate</label>
 				<input type="text" class="form-control" id="interestRate" name="interest_rate">
 			  </div>
 			</div>
-			<div class="col-md-2">
+			<div class="col-md-12">
 			  <div class="mb-3">
 				<label for="discountRate" class="form-label">Discount Rate</label>
 				<input type="text" class="form-control" id="discountRate" name="discount_rate">
 			  </div>
 			</div>
-			<div class="col-md-4">
-				<div class="mb-3">
-				  <label for="lcyAmount" class="form-label">LCY Amount</label>
-				  <input type="text" class="form-control" id="lcyAmount" name="lcy_amount">
-				</div>
-			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="faceValue" class="form-label">Face Value</label>
-				<input type="text" class="form-control" id="faceValue" name="face_value">
-			  </div>
-			</div>
-			<div class="col-md-6">
+			<div class="col-md-12">
 			  <div class="mb-">
 				<label for="issueDate" class="form-label">Issue Date</label>
 				<input type="date" class="form-control" id="issueDate" name="issue_date">
 			  </div>
 			</div>
-			<div class="col-md-6">
-			  <div class="mb-3">
-				<label for="maturityDate" class="form-label">Maturity Date</label>
-				<input type="date" class="form-control" id="maturityDate" name="maturity_date">
+			
+			<div class="modal-footer mt-4">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="saveChanges">Calculate</button>
 			  </div>
-			</div>
-          <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select class="form-select" id="status" name="status">
-              <option value="0">Inactive</option>
-              <option value="1">Active</option>
-            </select>
-          </div>
+			
         </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveChanges">Calculate</button>
-      </div>
+      
     </div>
   </div>
 </div>
@@ -305,66 +275,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Extract data from the row cells
         const transactionCode = row.cells[0].textContent.trim();
-        const branchPurchasedAt = row.cells[1].textContent.trim();
-        const accountDomicileBranch = row.cells[2].textContent.trim();
-        const accountNumber = row.cells[3].textContent.trim();
-        const currency = row.cells[5].textContent.trim();
-        const customerAmount = row.cells[6].textContent.trim();
-        const lcyAmount = row.cells[8].textContent.trim();
+        const tenor = row.cells[4].textContent.trim();
         const interestRate = row.cells[9].textContent.trim();
         const discountRate = row.cells[10].textContent.trim();
-        const faceValue = row.cells[11].textContent.trim();
         const issueDate = row.cells[12].textContent.trim();
-        const maturityDate = row.cells[13].textContent.trim();
-        const status = row.cells[14].querySelector('.alert').textContent.trim() === 'Inactive' ? '0' : '1';
 
         // Populate the form fields with extracted data
         treasuryBillForm.querySelector('#transactionCode').value = transactionCode;
-        treasuryBillForm.querySelector('#branchPurchasedAt').value = branchPurchasedAt;
-        treasuryBillForm.querySelector('#accountDomicileBranch').value = accountDomicileBranch;
-        treasuryBillForm.querySelector('#accountNumber').value = accountNumber;
-        treasuryBillForm.querySelector('#currency').value = currency;
-        treasuryBillForm.querySelector('#customerAmount').value = customerAmount;
-        treasuryBillForm.querySelector('#lcyAmount').value = lcyAmount;
+        treasuryBillForm.querySelector('#tenor').value = tenor;
         treasuryBillForm.querySelector('#interestRate').value = interestRate;
         treasuryBillForm.querySelector('#discountRate').value = discountRate;
-        treasuryBillForm.querySelector('#faceValue').value = faceValue;
-        
-        // Handle date fields
         treasuryBillForm.querySelector('#issueDate').value = formatDate(issueDate);
-        treasuryBillForm.querySelector('#maturityDate').value = formatDate(maturityDate);
-
-        treasuryBillForm.querySelector('#status').value = status;
     });
 
     // Function to format date into YYYY-MM-DD
     function formatDate(dateString) {
-    if (!dateString) return ''; // Handle empty values
+        if (!dateString) return ''; // Handle empty values
 
-    // Attempt to parse common date formats
-    const parsedDate = new Date(dateString);
-    
-    if (isNaN(parsedDate.getTime())) {
-        console.error('Invalid date:', dateString);
+        // Attempt to parse date in different formats
+        const dateFormats = [
+            'MM/DD/YYYY',
+            'DD/MM/YYYY',
+            'YYYY-MM-DD',
+        ];
+
+        // Iterate over possible date formats to parse the date
+        for (const format of dateFormats) {
+            const parsedDate = parseDate(dateString, format);
+            if (parsedDate) return parsedDate;
+        }
+
+        console.error(`Unable to parse date: ${dateString}`);
         return '';
     }
 
-    // Format as YYYY-MM-DD
-    const year = parsedDate.getFullYear();
-    const month = String(parsedDate.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-    const day = String(parsedDate.getDate()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}`;
-}
-
+    // Helper function to parse date based on a given format
+    function parseDate(dateString, format) {
+        const [day, month, year] = dateString.split(/[\/\-]/);
+        switch (format) {
+            case 'MM/DD/YYYY':
+                return `${year}-${month}-${day}`;
+            case 'DD/MM/YYYY':
+                return `${year}-${day}-${month}`;
+            case 'YYYY-MM-DD':
+                return dateString; // Already in the correct format
+            default:
+                return null; // Format not recognized
+        }
+    }
 
     // Handle form submission or Save changes
     document.getElementById('saveChanges').addEventListener('click', () => {
-        // Handle form submission, possibly via AJAX
-        console.log('Save changes clicked');
+        const formData = new FormData(treasuryBillForm);
+        fetch('/treasury/treasury-bill/approve/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken') // Ensure CSRF token is included
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            exampleModal.hide();
+        })
+        .catch(error => console.error('Error:', error));
     });
 });
 </script>
+
+
 
 
 
@@ -396,3 +376,5 @@ document.addEventListener('DOMContentLoaded', () => {
 </body>
 
 </html>
+
+{% endif %}

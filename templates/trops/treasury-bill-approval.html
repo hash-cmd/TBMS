@@ -1,0 +1,116 @@
+{% if request.user.department == 'trops' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'includes/head.html' %}
+
+    <!-- Include jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include Select2 CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <style>
+        .form-group label {
+            font-weight: 600;
+            color: #0468BF;
+        }
+        .form-control-file {
+            padding: 10px;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .file-preview {
+            margin-top: 10px;
+            display: none;
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+    {% include 'includes/header.html' %}
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+    {% include 'includes/side_nav.html' %}
+  </aside><!-- End Sidebar -->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Treasury Bill</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Branch</a></li>
+          <li class="breadcrumb-item active">Treasury Bill</li>
+          <li class="breadcrumb-item active">Bulk Approval</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="card shadow-sm p-4">
+        <form method="post" action="/trops/treasury-bill/bulk-debit/" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="file_upload" class="mb-3">Upload Approved File</label>
+                <input type="file" class="form-control" id="file_upload" name="file">
+                <!-- Changed the src to be blank initially -->
+                <img id="filePreview" class="file-preview" src="" alt="File Preview">
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+        </form>
+      </div>
+    </section>
+  </main><!-- End #main -->
+
+  {% include 'includes/footer.html' %}
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  {% include 'includes/script.html' %}
+
+  <script>
+    // Show a preview for image files
+    document.getElementById('file_upload').onchange = function(event) {
+        const preview = document.getElementById('filePreview');
+        const file = event.target.files[0];
+
+        if (file && file.type.startsWith('image/')) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        } else {
+            // Hide the preview if it's not an image
+            preview.style.display = 'none';
+            preview.src = '';  // Reset the src if no image
+        }
+    };
+  </script>
+</body>
+
+</html>
+
+
+{% endif %}

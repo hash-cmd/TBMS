@@ -359,14 +359,14 @@ h6 {
 }
 
 @media (min-width: 1200px) {
-  .logo {
-    width: 280px;
-  }
+    .logo {
+        width: 280px;
+        text-decoration: none;
+    }
 }
 
 .logo img {
-  max-height: 26px;
-  margin-right: 6px;
+    max-height: 32px;
 }
 
 .logo span {
@@ -377,14 +377,12 @@ h6 {
 }
 
 .header {
+  overflow: hidden;
   transition: all 0.5s;
   z-index: 997;
   height: 60px;
   box-shadow: 0px 2px 20px rgba(1, 41, 112, 0.1);
   background-color: #fff;
-  padding-left: 20px;
-  /* Toggle Sidebar Button */
-  /* Search Bar */
 }
 
 .header .toggle-sidebar-btn {
@@ -395,7 +393,7 @@ h6 {
 }
 
 .header .search-bar {
-  min-width: 360px;
+  min-width: 1320px;
   padding: 0 20px;
 }
 
@@ -598,11 +596,12 @@ h6 {
 # Sidebar
 --------------------------------------------------------------*/
 .sidebar {
+  background-color: #1e293b;
   position: fixed;
   top: 60px;
   left: 0;
   bottom: 0;
-  width: 300px;
+  width: 260px;
   z-index: 996;
   transition: all 0.3s;
   padding: 20px;
@@ -610,7 +609,6 @@ h6 {
   scrollbar-width: thin;
   scrollbar-color: #aab7cf transparent;
   box-shadow: 0px 0px 20px rgba(1, 41, 112, 0.1);
-  background-color: #fff;
 }
 
 @media (max-width: 1199px) {
@@ -684,9 +682,8 @@ h6 {
   align-items: center;
   font-size: 15px;
   font-weight: 600;
-  color: #4154f1;
+  color: #fff;
   transition: 0.3;
-  background: #f6f9ff;
   padding: 10px 15px;
   border-radius: 4px;
 }
@@ -694,31 +691,31 @@ h6 {
 .sidebar-nav .nav-link i {
   font-size: 16px;
   margin-right: 10px;
-  color: #4154f1;
+  color: #fff;
 }
 
 .sidebar-nav .nav-link.collapsed {
-  color: #012970;
-  background: #fff;
+  color: #fff;
 }
 
-.sidebar-nav .nav-link.collapsed i {
-  color: #899bbd;
-}
+ .sidebar-nav .nav-link.collapsed i {
+        color: #fff;
+    }
 
-.sidebar-nav .nav-link:hover {
-  color: #4154f1;
-  background: #f6f9ff;
-}
+ .sidebar-nav .nav-link:hover {
+        color: #1e293b;
+        background: #fff;
+    }
 
-.sidebar-nav .nav-link:hover i {
-  color: #4154f1;
-}
+  .sidebar-nav .nav-link:hover i {
+        color: #1e293b;
+    }
 
-.sidebar-nav .nav-link .bi-chevron-down {
-  margin-right: 0;
-  transition: transform 0.2s ease-in-out;
-}
+    .sidebar-nav .nav-link .bi-chevron-down {
+        margin-right: 0;
+        transition: transform 0.2s ease-in-out;
+        
+    }
 
 .sidebar-nav .nav-link:not(.collapsed) .bi-chevron-down {
   transform: rotate(180deg);
@@ -735,7 +732,8 @@ h6 {
   align-items: center;
   font-size: 14px;
   font-weight: 600;
-  color: #012970;
+  color: #fff;
+  text-decoration: none;
   transition: 0.3;
   padding: 10px 0 10px 40px;
   transition: 0.3s;
@@ -750,7 +748,7 @@ h6 {
 
 .sidebar-nav .nav-content a:hover,
 .sidebar-nav .nav-content a.active {
-  color: #4154f1;
+  color: #fff;
 }
 
 .sidebar-nav .nav-content a.active i {
@@ -821,18 +819,18 @@ h6 {
 }
 
 .dashboard .sales-card .card-icon {
-  color: #4154f1;
-  background: #f6f6fe;
+  color: #000;
+  background: #fff;
 }
 
 .dashboard .revenue-card .card-icon {
   color: #2eca6a;
-  background: #e0f8e9;
+  background: #fff;
 }
 
 .dashboard .customers-card .card-icon {
-  color: #ff771d;
-  background: #ffecdf;
+  color: #2eca6a;
+  background: #fff;
 }
 
 /* Activity */

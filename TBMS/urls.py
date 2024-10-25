@@ -24,4 +24,6 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('branch/', include('branch.urls')),
     path('treasury/', include('treasury.urls')),
+    path('trops/', include('trops.urls')),
+    path('super/', include('int_control.urls')),
 ]

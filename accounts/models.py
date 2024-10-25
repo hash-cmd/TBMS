@@ -5,19 +5,14 @@ import uuid
 
 class CustomUser(AbstractUser):
     DEPARTMENT = (
-        ('admin', 'IT Department'),
+        ('admin', 'Internal Control'),
         ('branch', 'Branch'),
         ('treasury', 'Treasury Department'),
-        ('troops', 'Troops Department'),
-    )
-
-    BRANCH = (
-        ('None', 'None'),
-        ('101', 'Airport Branch'),
+        ('trops', 'Troops Department'),
     )
 
     department = models.CharField(max_length=50, choices=DEPARTMENT)
-    branch_code = models.CharField(max_length=50, choices=BRANCH)
+    branch_code = models.CharField(max_length=50, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):

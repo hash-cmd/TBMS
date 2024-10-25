@@ -1,12 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\branch",
-    "\\templates",
-    "\\templates\\branch",
-    "\\templates\\branch\\treasury",
-    "\\treasury"
+    "\\accounts"
   ],
-  "SelectedNode": "\\treasury\\models.py",
+  "SelectedNode": "\\accounts\\views.py",
   "PreviewInSolutionExplorer": false
 }

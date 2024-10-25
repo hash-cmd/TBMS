@@ -1,3 +1,5 @@
+{% if request.user.department == 'branch' %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -29,12 +31,8 @@
 
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar" >
-
     {% include 'includes/side_nav.html' %}
 
-  </aside><!-- End Sidebar-->
 
   <main id="main" class="main p-3">
 
@@ -210,3 +208,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 
 </html>
+
+
+{% endif %}

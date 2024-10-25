@@ -27,7 +27,10 @@ class CustomerInformation(models.Model):
         ('Voters Card', 'Voters Card'),
         ('Certificate of Incorporation', 'Certificate of Incorporation'),
         ('Drivers License', 'Drivers License'),
-        
+    )
+
+    BRANCHES = (
+        ('101', 'Airport'),
     )
     
     slug = models.SlugField(unique=True)
@@ -51,7 +54,7 @@ class CustomerInformation(models.Model):
     expiry_date = models.DateField(blank=True, null=True)
     
     account_number = models.CharField(max_length=13, unique=True)
-    account_branch = models.CharField(max_length=13)
+    account_branch = models.CharField(max_length=255, blank=True, null=True, choices=BRANCHES, default='')
     csd_number = models.CharField(max_length=255, blank=True, null=True)
     
     image = models.FileField(upload_to='ID/')

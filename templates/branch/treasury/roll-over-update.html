@@ -1,3 +1,5 @@
+{% if request.user.department == 'branch' %}
+
 {% load static %}
 {% load widget_tweaks %}
 
@@ -22,10 +24,7 @@
     {% include 'includes/header.html' %}
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
     {% include 'includes/side_nav.html' %}
-  </aside><!-- End Sidebar -->
 
   <main id="main" class="main">
 
@@ -300,3 +299,4 @@
 </body>
 
 </html>
+{% endif %}

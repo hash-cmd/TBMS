@@ -1,3 +1,5 @@
+{% if request.user.department == 'branch' %}
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -16,22 +18,19 @@
 
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar" >
 
     {% include 'includes/side_nav.html' %}
-
-  </aside><!-- End Sidebar-->
 
   <main id="main" class="main p-3">
 
     <div class="pagetitle">
       <h1>Treasury Bill Information</h1>
       <nav class="d-flex justify-content-between">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Treasury</a></li>
-          <li class="breadcrumb-item active">All</li>
-        </ol>
+		  <ol class="breadcrumb">
+			  <li class="breadcrumb-item">Branch</li>
+			  <li class="breadcrumb-item">Treasuy Bill</li>
+			  <li class="breadcrumb-item active">All</li>
+		  </ol>
 
 
 
@@ -44,106 +43,112 @@
 		
 				
 
-		<div class="table-container p-3">
+		<div class="">
 		{% for message in messages %}
 					<div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
 				{% endfor %}
-		  <table class="p-3 border-dark table table-hover table-striped table-border datatable">
-				<thead>
-					<tr >
-					<th style="font-size: 12px;">Trans Code</th>
-					<th style="font-size: 12px;">Initiated At</th>
-					<th style="font-size: 12px;">Domicile Branch</th>
-					<th style="font-size: 12px;">Account Number</th>
-					<th style="font-size: 12px;">Tenor</th>
-					<th style="font-size: 12px;">Currency</th>
-					<th style="font-size: 12px;">Customer Amount</th>
-					<th style="font-size: 12px;">Maturity Instruction</th>
-					<th style="font-size: 12px;">LCY Amount</th>
-					<th style="font-size: 12px;">Interest Rate</th>
-					<th style="font-size: 12px;">Discount Rate</th>
-					<th style="font-size: 12px;">Face Value</th>
-					<th style="font-size: 12px;">Issue Date</th>
-					<th style="font-size: 12px;">Maturity Date</th>
-					<th style="font-size: 12px;">Status</th>
-					<th style="font-size: 12px;">Action</th>
-					</tr>
+					<div  class="table-container shadow p-3 rounded border border-1 border-dark" >
 
-				</thead>
-				<tbody>
-					{% for treasury_bill in all_treasury_bills %}
-					<tr class="text-center">
-						<td style="font-size: 12px;" class="text-dark">{{ treasury_bill.transaction_code }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.branch_purchased_at }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.account_domicile_branch }}</td>
-						<td style="font-size: 12px;">
-							<a href="#">
-								{{ treasury_bill.account_number.account_number }}
-							</a>
-						</td>
-						<td style="font-size: 12px;">{{ treasury_bill.tenor }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.currency.currency_sign }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.customer_amount }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.maturity_instruction }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.lcy_amount }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.interest_rate }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.discount_rate }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.face_value }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.issue_date }}</td>
-						<td style="font-size: 12px;">{{ treasury_bill.maturity_date }}</td>
-						
-						<td style="font-size: 12px;">
-							{% if treasury_bill.status == '0' %}
-								<div class="alert alert-danger p-1">Inactive</div>
-							{% elif treasury_bill.status == '1' %}
-								<div class="alert alert-success p-1">Inactive</div>
-							{% endif %}
-						</td>
-						<td>
-							<div class="btn-group">
-								<button type="button" class="btn btn-sm btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-									Action
-								</button>
-								<ul class="dropdown-menu">
-								{% if treasury_bill.interest_rate is None %}
-									<li><a class="dropdown-item" href="#" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit</a></li>
-									<li>
-									  <a class="dropdown-item text-danger" href="#" 
-										 data-bs-toggle="modal" 
-										 data-bs-target="#deleteModal" 
-										 data-slug="{{ treasury_bill.slug }}">
-										Delete
-									  </a>
-									</li>
-								{% endif %}
-									<li>
-										<a class="dropdown-item d-flex align-items-center" href="/branch/treasury-bill/terminate/{{treasury_bill.slug}}" target="_blank" style="line-height: 1.5;">
-											 Terminate
+
+						<table class="p-3 border-dark table table-hover table-striped table-border datatable">
+							<thead>
+								<tr>
+									<th style="font-size: 12px;">Trans Code</th>
+									<th style="font-size: 12px;">Initiated At</th>
+									<th style="font-size: 12px;">Domicile Branch</th>
+									<th style="font-size: 12px;">Account Name</th>
+									<th style="font-size: 12px;">Account Number</th>
+									<th style="font-size: 12px;">Tenor</th>
+									<th style="font-size: 12px;">Currency</th>
+									<th style="font-size: 12px;">Customer Amount</th>
+									<th style="font-size: 12px;">Maturity Instruction</th>
+									<th style="font-size: 12px;">LCY Amount</th>
+									<th style="font-size: 12px;">Interest Rate</th>
+									<th style="font-size: 12px;">Discount Rate</th>
+									<th style="font-size: 12px;">Face Value</th>
+									<th style="font-size: 12px;">Issue Date</th>
+									<th style="font-size: 12px;">Maturity Date</th>
+									<th style="font-size: 12px;">Status</th>
+									<th style="font-size: 12px;">Action</th>
+								</tr>
+
+							</thead>
+							<tbody>
+								{% for treasury_bill in all_treasury_bills %}
+								<tr class="text-center">
+									<td style="font-size: 12px;" class="text-dark">{{ treasury_bill.transaction_code }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.branch_purchased_at }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.account_domicile_branch }}</td>
+									<td style="font-size: 12px;">
+											{{ treasury_bill.account_number }}
+									</td>
+									<td style="font-size: 12px;">
+										<a href="#">
+											{{ treasury_bill.account_number.account_number }}
 										</a>
-									</li>
-								
+									</td>
+									<td style="font-size: 12px;">{{ treasury_bill.tenor }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.currency.currency_sign }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.customer_amount }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.maturity_instruction }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.lcy_amount }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.interest_rate }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.discount_rate }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.face_value }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.issue_date }}</td>
+									<td style="font-size: 12px;">{{ treasury_bill.maturity_date }}</td>
 
-										<li><hr class="dropdown-divider"></li>
-									
-									<li>
-										<a class="dropdown-item d-flex align-items-center" href="{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
-											<i class="bi bi-cloud-download"></i> Download
-										</a>
-									</li>
-									<li>
-										<a class="dropdown-item d-flex align-items-center" href="{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
-											<i class="bi bi-printer"></i> Print
-										</a>
-									</li>
-								</ul>
-							</div>
-						</td>
+									<td style="font-size: 12px;">
+										{% if treasury_bill.status == '0' %}
+										<div class="alert alert-danger p-1">Inactive</div>
+										{% elif treasury_bill.status == '1' %}
+										<div class="alert alert-success p-1">active</div>
+										{% endif %}
+									</td>
+									<td>
+										<div class="btn-group">
+											<button type="button" class="btn btn-sm btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+												Action
+											</button>
+											<ul class="dropdown-menu">
+												{% if treasury_bill.interest_rate is None %}
+												<li><a class="dropdown-item" href="/branch/treasury-bill/edit/{{treasury_bill.slug}}">Edit</a></li>
+												<li>
+													<a class="dropdown-item text-danger" href="#"
+													   data-bs-toggle="modal"
+													   data-bs-target="#deleteModal"
+													   data-slug="{{ treasury_bill.slug }}">
+														Delete
+													</a>
+												</li>
+												<li><hr class="dropdown-divider"></li>
+												<li>
+													<a class="dropdown-item d-flex align-items-center" href="/branch{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
+														<i class="bi bi-printer"></i> Print
+													</a>
+												</li>
+												{% elif treasury_bill.interest_rate %}
+												<li>
+													<a class="dropdown-item text-danger d-flex align-items-center" href="/branch/treasury-bill/terminate/{{treasury_bill.slug}}" target="_blank" style="line-height: 1.5;">
+														Terminate
+													</a>
+												</li>
+												<li><hr class="dropdown-divider"></li>												<li>
+													<a class="dropdown-item d-flex align-items-center" href="/branch{{ treasury_bill.file.url }}" target="_blank" style="line-height: 1.5;">
+														<i class="bi bi-printer"></i> Print
+													</a>
+												</li>
+												{% endif %}
+											</ul>
+										</div>
+									</td>
 
-					</tr>
+								</tr>
 
-					{% endfor %}
-			</tbody>
-		  </table>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
 		</div>
 		
     </section>
@@ -155,7 +160,7 @@
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Treasury Bill Approval</h1>
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Treasury Bill Edit</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -196,54 +201,12 @@
 				<input type="text" class="form-control" id="customerAmount" name="customer_amount" readonly>
 			  </div>
 			</div>
-			<div class="col-md-2">
-			  <div class="mb-3">
-				<label for="interestRate" class="form-label">Interest Rate</label>
-				<input type="text" class="form-control" id="interestRate" name="interest_rate">
-			  </div>
-			</div>
-			<div class="col-md-2">
-			  <div class="mb-3">
-				<label for="discountRate" class="form-label">Discount Rate</label>
-				<input type="text" class="form-control" id="discountRate" name="discount_rate">
-			  </div>
-			</div>
-			<div class="col-md-4">
-				<div class="mb-3">
-				  <label for="lcyAmount" class="form-label">LCY Amount</label>
-				  <input type="text" class="form-control" id="lcyAmount" name="lcy_amount">
-				</div>
-			</div>
-			<div class="col-md-4">
-			  <div class="mb-3">
-				<label for="faceValue" class="form-label">Face Value</label>
-				<input type="text" class="form-control" id="faceValue" name="face_value">
-			  </div>
-			</div>
-			<div class="col-md-6">
-			  <div class="mb-">
-				<label for="issueDate" class="form-label">Issue Date</label>
-				<input type="date" class="form-control" id="issueDate" name="issue_date">
-			  </div>
-			</div>
-			<div class="col-md-6">
-			  <div class="mb-3">
-				<label for="maturityDate" class="form-label">Maturity Date</label>
-				<input type="date" class="form-control" id="maturityDate" name="maturity_date">
-			  </div>
-			</div>
-          <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select class="form-select" id="status" name="status">
-              <option value="0">Inactive</option>
-              <option value="1">Active</option>
-            </select>
-          </div>
+			
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="saveChanges">Calculate</button>
+        <button type="button" class="btn btn-primary" id="saveChanges">Save</button>
       </div>
     </div>
   </div>
@@ -367,3 +330,6 @@
 </body>
 
 </html>
+
+
+{% endif %}

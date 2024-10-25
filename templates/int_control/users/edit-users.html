@@ -1,0 +1,49 @@
+{% if request.user.department == 'admin' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'includes/head.html' %}
+</head>
+<body>
+    {% include 'includes/header.html' %}
+    {% include 'includes/side_nav.html' %}
+
+    <main id="main" class="main p-3">
+        <div class="pagetitle">
+            <h1>Edit User - {{ user.username }}</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'user_list' %}">Users</a></li>
+                    <li class="breadcrumb-item active">Edit User</li>
+                </ol>
+            </nav>
+        </div>
+
+        <section class="section">
+            <div class="row">
+                <div class="col-xl-8">
+
+                    <div class="card">
+                        <div class="card-body pt-3">
+                            <form method="POST">
+                                {% csrf_token %}
+                                {{ form.as_p }}
+                                
+                                <button type="submit" class="btn btn-primary">Update</button>
+                                <a href="{% url 'user_list' %}" class="btn btn-secondary">Cancel</a>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'includes/footer.html' %}
+    {% include 'includes/script.html' %}
+</body>
+</html>
+
+{% endif %}

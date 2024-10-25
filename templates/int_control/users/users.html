@@ -1,0 +1,273 @@
+{% if request.user.department == 'admin' %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	{% include 'includes/head.html' %}
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center" style="background-color: #0468BF;">
+
+    {% include 'includes/header.html' %}
+
+  </header><!-- End Header -->
+
+  
+    {% include 'includes/side_nav.html' %}
+
+  <main id="main" class="main p-3">
+
+    <div class="pagetitle">
+      <h1>User Manager</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">Internal Control</li>
+          <li class="breadcrumb-item active">Admin</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+	  
+	  
+		 <div class="col-xl-12">
+
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+			  <div class="d-flex align-items-center p-3">
+			  
+				<ul class=" nav nav-tabs nav-tabs-bordered">
+					<li class="nav-item">
+					  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">All Users</button>
+					</li>
+				</ul>
+				
+				
+			</div>
+              <div class="tab-content pt-2">
+
+                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+					<div class="table-container">
+					  <table class="table table-hover table-striped table-border datatable">
+							<thead >
+								<tr >
+									<th style="font-size: 12px;">Date Joined</th>
+									<th style="font-size: 12px;">Last Login</th>
+									<th style="font-size: 12px;">Username</th>
+									<th style="font-size: 12px;">First Name</th>
+									<th style="font-size: 12px;">Last Name</th>
+									<th style="font-size: 12px;">Email</th>
+									<th style="font-size: 12px;">Active</th>
+									<th style="font-size: 12px;">Department</th>
+									<th style="font-size: 12px;">Branch</th>
+									<th style="font-size: 12px;">Action</th>
+								</tr>
+
+							</thead>
+					<tbody>
+						{% for user in all_users %}
+						<tr >
+							<td style="font-size: 12px;">{{ user.date_joined }}</td>
+							<td style="font-size: 12px;" class="text-dark">{{ user.last_login }}</td>
+							<td style="font-size: 12px;" class="text-dark">{{ user.username }}</td>
+							<td style="font-size: 12px;">{{ user.first_name }}</td>
+							<td style="font-size: 12px;">{{ user.last_name}}</td>
+							<td style="font-size: 12px;">{{ user.email }}</td>
+							<td style="font-size: 12px;">{{ user.is_active }}</td>
+							<td style="font-size: 12px;">{{ user.department }}</td>
+							<td style="font-size: 12px;">{{ user.branch_code }}</td>
+			
+							<td>
+							  <div class="btn-group">
+								<button type="button" class="btn btn-sm btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+								  Action
+								</button>
+								<ul class="dropdown-menu">
+								  <li><a class="dropdown-item edit-btn" href="#" data-id="{{ user.slug }}" data-username="{{ user.username }}" data-first-name="{{ user.first_name }}" data-last-name="{{ user.last_name }}" data-email="{{ user.email }}" data-department="{{ user.department }}" data-branch="{{ user.branch_code }}">Edit</a></li>
+								  <li><a class="dropdown-item text-danger" href="#">Delete</a></li>
+								</ul>
+							  </div>
+							</td>
+
+						</tr>
+
+						{% endfor %}
+					</tbody>
+				  </table>
+					</div>
+                </div>
+
+              </div><!-- End Bordered Tabs -->
+
+            </div>
+          </div>
+
+        </div>
+
+   
+	  
+    </section>
+	
+
+
+
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editUserForm" method="POST" action="">
+          {% csrf_token %}
+          <input type="hidden" name="slug" id="editUserId">
+          <div class="mb-3">
+            <label for="editUsername" class="form-label">Username</label>
+            <input type="text" class="form-control" id="editUsername" name="username" required>
+          </div>
+          <div class="mb-3">
+            <label for="editFirstName" class="form-label">First Name</label>
+            <input type="text" class="form-control" id="editFirstName" name="first_name">
+          </div>
+          <div class="mb-3">
+            <label for="editLastName" class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="editLastName" name="last_name">
+          </div>
+          <div class="mb-3">
+            <label for="editEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="editEmail" name="email" required>
+          </div>
+          <div class="mb-3">
+			<label for="editDepartment" class="form-label">Department</label>
+			<select class="form-select" id="editDepartment" name="department">
+				<option value="" disabled selected>Select Department</option>
+				<option value="admin">Internal Control</option>
+				<option value="branch">Branch</option>
+				<option value="treasury">Treasury Department</option>
+				<option value="trops">Trops</option>
+			</select>
+		</div>
+
+          <div class="mb-3">
+    <label for="editBranch" class="form-label">Branch</label>
+    <select class="form-select" id="editBranch" name="branch_code">
+	
+        <option value="">Select Branch</option>
+        {% for branch in all_branchs %}
+			<option value="{{ branch.branch_code }}">{{ branch.branch_name }}</option>
+		{% endfor %}
+    </select>
+</div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="saveChangesBtn">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+	
+	
+	
+	<!-- Button trigger modal -->
+	
+
+	
+	
+
+  </main><!-- End #main -->
+
+ 
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  
+  
+  {% include 'includes/script.html' %}
+  
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editButtons = document.querySelectorAll('.edit-btn');
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    const editForm = document.getElementById('editUserForm');
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');
+            const username = this.getAttribute('data-username');
+            const firstName = this.getAttribute('data-first-name');
+            const lastName = this.getAttribute('data-last-name');
+            const email = this.getAttribute('data-email');
+            const department = this.getAttribute('data-department');
+            const branch = this.getAttribute('data-branch');
+
+            // Populate the form fields
+            document.getElementById('editUsername').value = username;
+            document.getElementById('editFirstName').value = firstName;
+            document.getElementById('editLastName').value = lastName;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editDepartment').value = department; // Set selected department
+            document.getElementById('editBranch').value = branch;        // Set selected branch
+            document.getElementById('editUserId').value = userId;
+
+            // Set the form action dynamically
+            editForm.action = `/super/edit-user/${userId}/`;
+
+            // Show the modal
+            editModal.show();
+        });
+    });
+
+    // Handle Save Changes button
+    document.getElementById('saveChangesBtn').addEventListener('click', function() {
+        const formData = new FormData(editForm);
+
+        fetch(editForm.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close the modal and reload the page or update the UI dynamically
+                editModal.hide();
+                alert(data.message);
+                 // Optionally reload the page to see the updated data
+            } else {
+                alert(data.message || 'An error occurred');
+            }
+			 location.reload();
+        })
+        
+
+    });
+});
+
+</script>
+
+  
+  
+
+</body>
+
+</html>
+
+{% endif %}

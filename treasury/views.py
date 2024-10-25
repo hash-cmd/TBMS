@@ -3,58 +3,58 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from django.contrib.auth.decorators import login_required
 
 from branch.models import CustomerInformation
-from treasury.models import Branchs, Currency, TreasuryBills, Withdrawal
+from treasury.models import Branchs, Currency, TreasuryBills, Withdrawal, TransactionDetails
 from treasury.forms import NewBranchForm, NewCurrencyForm
 
 import csv
 import pandas as pd
 from datetime import datetime, timedelta
-from django.utils.dateparse import parse_date
+from django.utils.dateparse import parse_date, parse_datetime
 
 
-
-# Create your views here.
+@login_required(login_url='/')  
 def dashboard(request):
     total_customers = CustomerInformation.objects.count()
-    
-    # Get the current date
+
     now = timezone.now()
-    
-    # Calculate the start and end of the current week
-    start_of_week = now - timezone.timedelta(days=now.weekday())  # Monday
-    end_of_week = start_of_week + timezone.timedelta(days=6)  # Sunday
-    
+
+    start_of_week = now - timezone.timedelta(days=now.weekday()) 
+    end_of_week = start_of_week + timezone.timedelta(days=4) 
+
+    start_of_week = timezone.make_aware(datetime.combine(start_of_week, datetime.min.time()))
+    end_of_week = timezone.make_aware(datetime.combine(end_of_week, datetime.max.time()))
+
+    total_requests = TreasuryBills.objects.filter(
+        Q(created_at__range=(start_of_week, end_of_week)) &
+        Q(status='0')
+    )
+    total_requests_amount = total_requests.aggregate(total=Sum('customer_amount'))['total'] or 0
+    total_requests_amount = round(total_requests_amount, 2)
+
     total_running_treasury_bills = TreasuryBills.objects.filter(status='1').count()
     total_non_running_treasury_bills = TreasuryBills.objects.filter(status='0').count()
-    
+
     total_face_value = TreasuryBills.objects.filter(status='1').aggregate(total=Sum('face_value'))['total'] or 0
     total_face_value = round(total_face_value, 2)
-    
-    total_face_value_not_running = TreasuryBills.objects.filter(
-        status='0',
-        issue_date__range=[start_of_week, end_of_week]
-    ).aggregate(total=Sum('customer_amount'))['total'] or 0
-    total_face_value_not_running = round(total_face_value_not_running, 2)
-    
-    non_running_treasury_bills = TreasuryBills.objects.filter(
-        status=0
-    )
-    
+
     context = {
         'total_customers': total_customers,
+        'total_requests': total_requests,
+        'total_requests_count': total_requests.count(),
         'total_running_treasury_bills': total_running_treasury_bills,
         'total_non_running_treasury_bills': total_non_running_treasury_bills,
+        'total_requests_amount': total_requests_amount,
         'total_face_value': total_face_value,
-        'total_face_value_not_running': total_face_value_not_running,
-        'non_running_treasury_bills': non_running_treasury_bills,
-    }
+    }                                                
+    
     return render(request, 'treasury/index.html', context)
     
     
-
+@login_required(login_url='/')  
 def branch(request):
     all_branches = Branchs.objects.all()
     all_branch_count = Branchs.objects.all().count()
@@ -64,7 +64,6 @@ def branch(request):
             branch_code = form.cleaned_data.get('branch_code')
             branch_name = form.cleaned_data.get('branch_name')
             
-            # Check if a branch with the same branch_code or branch_name already exists
             if Branchs.objects.filter(branch_code=branch_code).exists() or Branchs.objects.filter(branch_name=branch_name).exists():
                 messages.error(request, "Branch with this code or name already exists.")
             else:
@@ -83,7 +82,7 @@ def branch(request):
     return render(request, 'treasury/branch.html', context)
     
     
-    
+@login_required(login_url='/')    
 def currency(request):
     all_currency = Currency.objects.all()
     all_currency_count = Currency.objects.all().count()
@@ -93,7 +92,6 @@ def currency(request):
             currency_sign = form.cleaned_data.get('currency_sign')
             currency_name = form.cleaned_data.get('currency_name')
             
-            # Check if a branch with the same branch_code or branch_name already exists
             if Currency.objects.filter(currency_sign=currency_sign).exists() or Currency.objects.filter(currency_name=currency_name).exists():
                 messages.error(request, "Branch with this code or name already exists.")
             else:
@@ -110,18 +108,72 @@ def currency(request):
         'all_currency_count': all_currency_count,
     }    
     return render(request, 'treasury/currency.html', context)   
+    
+    
+
+
+@login_required(login_url='/')  
+def approve_single_treasury_bill(request):
+    if request.method == 'POST':
+        # Retrieve the data from the POST request
+        transaction_code = request.POST.get('transaction_code')
+        interest_rate = request.POST.get('interest_rate')
+        discount_rate = request.POST.get('discount_rate')
+        issue_date = request.POST.get('issue_date')
+
+        try:
+            treasury_bill_request = TreasuryBills.objects.get(transaction_code=transaction_code)
+            customer_amount = float(treasury_bill_request.customer_amount)
+
+            tenor_days = treasury_bill_request.tenor
+            face_value = round((customer_amount * (float(interest_rate) / 100) * tenor_days / 364) + customer_amount, 2)
+
+            print(f"Calculated Face Value: {face_value}")
+
+            discount_rate = float(discount_rate)
+            lcy_amount = abs(face_value * (1 - (discount_rate / 100) * tenor_days / 364))
+
+            treasury_bill_request.face_value = face_value
+            treasury_bill_request.lcy_amount = lcy_amount
+            treasury_bill_request.interest_rate = interest_rate
+            treasury_bill_request.discount_rate = discount_rate
+            
+            issue_date_dt = pd.to_datetime(issue_date, format='%m/%d/%Y', errors='coerce')
+            if pd.notna(issue_date_dt):
+                current_time = timezone.now()
+                issue_date_with_time = issue_date_dt.replace(hour=current_time.hour, minute=current_time.minute, second=current_time.second)
+
+                treasury_bill_request.issue_date = issue_date_with_time
+                treasury_bill_request.maturity_date = issue_date_with_time + timedelta(days=tenor_days)
+
+            treasury_bill_request.save()
+
+            print("Treasury Bill approved and updated successfully.")
+
+            messages.success(request, 'Treasury Bill approved and updated successfully.')
+            return redirect('/treasury/treasury-bill/')
+
+        except TreasuryBills.DoesNotExist:
+            messages.error(request, 'Treasury Bill does not exist!')
+            return redirect('/treasury/treasury-bill/')
+
+        except Exception as e:
+            messages.error(request, 'Treasury Bill Error!')
+            return redirect('/treasury/treasury-bill/')
+
+    return redirect('/treasury/treasury-bill/')
 
 
 
 
+
+@login_required(login_url='/')  
 def approve_treasury_bill(request):
     if request.method == 'POST' and request.FILES.get('file_upload'):
         file = request.FILES['file_upload']
         if file.name.endswith('.csv'):
-            # Read the CSV file using pandas
             df = pd.read_csv(file)
 
-            # Optional: Validate CSV columns
             expected_columns = [
                 'Transaction Code', 'Branch Purchased At', 'Account Domicile Branch',
                 'Account Number', 'Account Name', 'Tenor', 'Currency', 'Customer Amount',
@@ -131,26 +183,20 @@ def approve_treasury_bill(request):
             if not all(column in df.columns for column in expected_columns):
                 return HttpResponse('CSV file is missing some required columns')
 
-            # Get the current time
             current_time = datetime.now().time()
 
-            # Process each row of the DataFrame
             for _, row in df.iterrows():
                 transaction_code = row.get('Transaction Code')
 
-                # Check if the transaction code already exists
                 tbill = TreasuryBills.objects.filter(transaction_code=transaction_code).first()
 
                 if tbill:
-                    # Update only specified fields
                     tbill.interest_rate = row.get('Interest Rate')
                     tbill.discount_rate = row.get('Discount Rate')
 
-                    # Parse issue_date and add current time
                     issue_date_str = row.get('Issue Date')
                     if issue_date_str:
                         try:
-                            # Parse the date and add the current time
                             issue_date = pd.to_datetime(issue_date_str, format='%m/%d/%Y', errors='coerce')
                             if pd.notna(issue_date):
                                 issue_date = issue_date.replace(hour=current_time.hour, minute=current_time.minute, second=current_time.second)
@@ -158,28 +204,25 @@ def approve_treasury_bill(request):
                         except ValueError:
                             return HttpResponse('Invalid date format for Issue Date')
 
-                    # Calculate maturity_date based on tenor
                     tenor_days = row.get('Tenor')
                     if pd.notna(tenor_days):
-                        tenor_days = int(tenor_days)  # Convert tenor to integer if it's not null
+                        tenor_days = int(tenor_days)
                         if tbill.issue_date:
                             tbill.maturity_date = tbill.issue_date + timedelta(days=tenor_days)
 
-                    # Calculate face_value based on the provided formula
                     customer_amount = row.get('Customer Amount')
                     interest_rate = row.get('Interest Rate')
                     if pd.notna(customer_amount) and pd.notna(interest_rate):
                         customer_amount = float(customer_amount)
                         interest_rate = float(interest_rate)
-                        face_value = round((customer_amount * (interest_rate / 100) * tenor_days / 364) + customer_amount, 2)
+                        face_value = round((customer_amount * (interest_rate / 100) * tenor_days / 364) + customer_amount)
                         tbill.face_value = face_value
 
-                    # Calculate lcy_amount based on the provided formula
                     discount_rate = row.get('Discount Rate')
                     if pd.notna(discount_rate):
                         discount_rate = float(discount_rate)
                         lcy_amount = abs(face_value * (1 - (discount_rate / 100) * tenor_days / 364))
-                        tbill.lcy_amount = round(lcy_amount, 2)
+                        tbill.lcy_amount = lcy_amount
                     tbill.roll_over_instruction = None
                     tbill.save(update_fields=['interest_rate', 'discount_rate', 'issue_date', 'maturity_date', 'face_value', 'lcy_amount'])
 
@@ -191,21 +234,16 @@ def approve_treasury_bill(request):
 
 
 
-
-
-
+@login_required(login_url='/')  
 def export_treasury_bills_to_csv(request):
-    # Get the date range from the GET request
     from_date = request.GET.get('from_date')
     to_date = request.GET.get('to_date')
 
-    # Parse the dates
     if from_date:
         from_date = parse_date(from_date)
     if to_date:
         to_date = parse_date(to_date)
 
-    # Filter the records based on the selected date range
     t_bills_with_null_fields = TreasuryBills.objects.filter(
         interest_rate__isnull=True,
         discount_rate__isnull=True,
@@ -225,24 +263,28 @@ def export_treasury_bills_to_csv(request):
             created_at__lte=to_date
         )
 
-    # Create the HttpResponse object with the appropriate CSV header
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="t_bills.csv"'
+    response['Content-Disposition'] = 'attachment; filename="PENDING_TREASURY_BILLS.csv"'
 
-    # Create a CSV writer
     writer = csv.writer(response)
-
-    # Define the CSV column headers
     headers = [
         'Transaction Code', 'Branch Purchased At', 'Account Domicile Branch', 
         'Account Number', 'Account Name', 'Tenor', 'Currency', 'Customer Amount', 
         'Maturity Instruction', 'Interest Rate', 
         'Discount Rate', 'Issue Date', 'Status', 'Created At'
     ]
-    writer.writerow(headers)  # Write the header row
-
-    # Write each record to the CSV
+    writer.writerow(headers)  
     for t_bill in t_bills_with_null_fields:
+
+        if t_bill.maturity_instruction == 1:
+            maturity_instruction_text = 'Pay Principal & Interest on Maturity'
+        elif t_bill.maturity_instruction == 2:
+            maturity_instruction_text = 'Roll - Over with Interest on Maturity'
+        elif t_bill.maturity_instruction == 3:
+            maturity_instruction_text = 'Roll - Over Principal only on Maturity'
+        else:
+            maturity_instruction_text = t_bill.maturity_instruction  
+    
         writer.writerow([
             t_bill.transaction_code,
             t_bill.branch_purchased_at,
@@ -252,7 +294,7 @@ def export_treasury_bills_to_csv(request):
             t_bill.tenor,
             t_bill.currency.currency_sign,
             t_bill.customer_amount,
-            t_bill.maturity_instruction,
+             maturity_instruction_text,
             t_bill.interest_rate,
             t_bill.discount_rate,
             t_bill.issue_date,
@@ -264,8 +306,9 @@ def export_treasury_bills_to_csv(request):
 
 
 
+
+@login_required(login_url='/')  
 def delete_treasury_bill(request, slug):
-    # Retrieve the TreasuryBill instance based on the slug
     delete_instance = get_object_or_404(TreasuryBills, slug=slug)
     delete_instance.delete()
     messages.success(request, 'Treasury Bill deleted successfully!')
@@ -273,7 +316,7 @@ def delete_treasury_bill(request, slug):
     
 
 
-    
+@login_required(login_url='/')    
 def treasury_bill(request):
     all_treasury_bills = TreasuryBills.objects.all()
     context = {
@@ -282,7 +325,13 @@ def treasury_bill(request):
     return render(request, 'treasury/treasury-bills.html', context)
     
     
-    
+@login_required(login_url='/')   
 def withdrawal_list(request):
     withdrawals = Withdrawal.objects.all()
     return render(request, 'treasury/withdrawals.html', {'withdrawals': withdrawals})
+
+@login_required(login_url='/')  
+def all_transactions(request):
+    transactions = TransactionDetails.objects.all()
+    return render(request, 'treasury/all-transactions.html', {'transactions': transactions})
+ 

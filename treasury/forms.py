@@ -41,3 +41,6 @@ class NewCurrencyForm(forms.ModelForm):
             })
         }
 
+
+
+

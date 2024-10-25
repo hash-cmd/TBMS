@@ -1,3 +1,5 @@
+{% if request.user.department == 'branch' %}
+
 {% load static %}
 {% load widget_tweaks %}
 
@@ -22,10 +24,8 @@
     {% include 'includes/header.html' %}
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
+
     {% include 'includes/side_nav.html' %}
-  </aside><!-- End Sidebar -->
 
   <main id="main" class="main">
 
@@ -59,7 +59,7 @@
 					<div class="row p-3">
 						<div class="col-md-4 mb-3">
 							<label for="{{ form.branch_purchased_at.id_for_label }}" class="form-label">{{ form.branch_purchased_at.label }} <sup class="text-danger">*</sup></label>
-							<select class="form-select" size="2" name="branch_purchased_at">
+							<select class="form-select" name="branch_purchased_at">
 							  <option>-- Select Branch --</option>
 							  {% for branch in all_branch %}
 								<option value="{{branch.branch_code}}">{{ branch.branch_name }}</option>
@@ -215,3 +215,6 @@
 </body>
 
 </html>
+
+
+{% endif %}

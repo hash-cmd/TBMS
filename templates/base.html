@@ -4,15 +4,19 @@
 <!DOCTYPE html>
 <html lang="en">
 
-	<body class="bg-white">
+<head>
+	{% include 'includes/head.html' %}
+</head>
 
-		<!-- login page -->
-		{% block Login %}
-		{% endblock Login %}
+<body class="bg-white">
 
-		{% block redirect %}
-		{% endblock redirect %}
+	<!-- login page -->
+	{% block login %}
+	{% endblock login %}
+
+	{% block redirect %}
+	{% endblock redirect %}
 
 
-	</body>
+</body>
 </html>

@@ -4,12 +4,18 @@ from django.utils import  timezone
 from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
 from django.http import HttpResponseRedirect, JsonResponse
+import re
+from django.contrib.auth.decorators import login_required
 
-from branch.forms import NewCustomerForm, NewTreasuryBillForm
+from branch.forms import NewCustomerForm, EditCustomerForm, NewTreasuryBillForm, EditTreasuryBillForm
+from django.db.models import Sum, Q
 from branch.models import CustomerInformation 
-from treasury.models import TreasuryBills, Branchs, Currency, Withdrawal
+from treasury.models import MaturedTBills, TreasuryBills, Branchs, Currency, Withdrawal, TransactionDetails
 
 from dal import autocomplete
+from django.core.mail import send_mail
+from django.conf import settings
+
 
 
 # Create your views here.
@@ -27,7 +33,7 @@ class CustomerAutocomplete(autocomplete.Select2QuerySetView):
 
 
 
-
+@login_required(login_url='/')
 def dashboard(request):
     today = datetime.today()
     current_weekday = today.weekday()
@@ -39,28 +45,33 @@ def dashboard(request):
     
     # Query for this week's treasury bills
     this_week_t_bills = TreasuryBills.objects.filter(
-        maturity_date__range=[start_of_week, end_of_week]
+        created_at__range=[start_of_week, end_of_week]
     )
     
-    # Get the user's branch (assuming it's stored in the request or user profile)
     user_branch = request.user.branch_code
-    
-    # Query for all customers in the user's branch
-    all_branch_customers = CustomerInformation.objects.filter(account_branch=user_branch)
-    
-    # Total number of customers in the branch
+    all_branch_customers = CustomerInformation.objects.all()
     total_customers_in_branch = all_branch_customers.count()
-
+    
+    running_branch_t_bills = TreasuryBills.objects.filter(account_domicile_branch__branch_code=user_branch).aggregate(total=Sum('lcy_amount'))['total'] or 0
+    running_branch_t_bills_count = TreasuryBills.objects.filter(
+        Q(account_domicile_branch__branch_code=user_branch) &
+        Q(status=1)
+        ).count() 
+    running_branch_t_bills = round(running_branch_t_bills, 2)
+    matured_count = MaturedTBills.objects.filter(branch_purchased_at=user_branch).count()
+    
     return render(request, 'branch/index.html', {
         'this_week_t_bills': this_week_t_bills,
-        'all_branch_customers': all_branch_customers,
         'total_customers_in_branch': total_customers_in_branch,
+        'running_branch_t_bills': running_branch_t_bills,
+        'running_branch_t_bills_count': running_branch_t_bills_count,
+        'matured_count': matured_count,
     })
 
     
 
 
-
+@login_required(login_url='/')
 def new_treasury_bill(request):
     all_currency = Currency.objects.all()
     all_branch = Branchs.objects.all()
@@ -69,18 +80,9 @@ def new_treasury_bill(request):
         form = NewTreasuryBillForm(request.POST, request.FILES)
         if form.is_valid():
             treasury_bill = form.save(commit=False)
+        
+            treasury_bill.transaction_code = '033'
             
-            # Generate the new transaction code
-            last_treasury_bill = TreasuryBills.objects.order_by('-id').first()
-            if last_treasury_bill and last_treasury_bill.transaction_code:
-                last_transaction_code = last_treasury_bill.transaction_code
-                new_transaction_code = str(int(last_transaction_code) + 1).zfill(len(last_transaction_code))
-            else:
-                new_transaction_code = '1'
-            
-            treasury_bill.transaction_code = new_transaction_code
-            
-            # Fetch the CustomerInformation instance based on the selected account number
             account_number = form.cleaned_data.get('account_number')
             if account_number:
                 try:
@@ -103,20 +105,52 @@ def new_treasury_bill(request):
         'all_branch': all_branch,
     }
     return render(request, 'branch/treasury/new-treasury-bill.html', context)
-
-
-def update_t_bill_rollover_with_interest(request, slug):
     
+    
+    
+@login_required(login_url='/')    
+def edit_treasury_bill(request, slug):
+    instance = get_object_or_404(TreasuryBills, slug=slug)
+    all_branch = Branchs.objects.all()
+    if request.method == 'POST':
+        form = EditTreasuryBillForm(request.POST, request.FILES, instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Treasury Bill updated successfully.')
+            return redirect('/branch/treasury-bill/')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = EditTreasuryBillForm(instance=instance)
+    
+    return render(request, 'branch/treasury/edit-treasury-bill.html', {'form': form,  'all_branch': all_branch,})    
+    
+    
+    
+  
+@login_required(login_url='/')
+def update_t_bill_rollover_with_interest(request, slug):
     update_instance = get_object_or_404(TreasuryBills, slug=slug)
+    
+    # Update the instance
     update_instance.roll_over_instruction = '1'
     update_instance.maturity_instruction = 2
     update_instance.save()
     
+    # Sending email
+    subject = 'Treasury Bill Roll-Over Update'
+    message = f'The Treasury Bill with transaction code {update_instance.transaction_code} has been successfully updated with a roll-over instruction to rollover principal and interest'
+    recipient_list = ['Treasury@omnibsic.com.gh']  # Replace with the actual recipient's email
+    from_email = settings.DEFAULT_FROM_EMAIL  # Ensure your settings.py has the correct email setup
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
     messages.success(request, 'Treasury Bill Updated successfully!')
+    
     return redirect('/branch/notify/')
 
 
-
+@login_required(login_url='/')
 def update_t_bill_rollover_principal(request, slug):
     
     update_instance = get_object_or_404(TreasuryBills, slug=slug)
@@ -124,10 +158,18 @@ def update_t_bill_rollover_principal(request, slug):
     update_instance.maturity_instruction = 3
     update_instance.save()
     
+    # Sending email
+    subject = 'Treasury Bill Roll-Over Update'
+    message = f'The Treasury Bill with transaction code {update_instance.transaction_code} has been successfully updated with a roll-over instruction to only roll over the principal'
+    recipient_list = ['Treasury@omnibsic.com.gh']  # Replace with the actual recipient's email
+    from_email = settings.DEFAULT_FROM_EMAIL  # Ensure your settings.py has the correct email setup
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    
     messages.success(request, 'Treasury Bill Updated successfully!')
     return redirect('/branch/notify/')
 
-
+@login_required(login_url='/')
 def update_t_bill_do_not_rollover(request, slug):
     
     update_instance = get_object_or_404(TreasuryBills, slug=slug)
@@ -135,11 +177,19 @@ def update_t_bill_do_not_rollover(request, slug):
     update_instance.maturity_instruction = 1
     update_instance.save()
     
+    # Sending email
+    subject = 'Treasury Bill Roll-Over Update'
+    message = f'The Treasury Bill with transaction code {update_instance.transaction_code} has been successfully updated not to to rollover at maturity'
+    recipient_list = ['Treasury@omnibsic.com.gh']  # Replace with the actual recipient's email
+    from_email = settings.DEFAULT_FROM_EMAIL  # Ensure your settings.py has the correct email setup
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    
     messages.success(request, 'Treasury Bill Updated successfully!')
     return redirect('/branch/notify/')
     
 
-
+login_required(login_url='/')
 def terminate_t_bill(request, slug):
     # Get the TreasuryBills instance using the slug
     termination_instance = get_object_or_404(TreasuryBills, slug=slug)
@@ -148,6 +198,13 @@ def terminate_t_bill(request, slug):
     termination_instance.roll_over_instruction = '3'
     termination_instance.maturity_instruction = 1
     termination_instance.save()
+
+    subject = 'Treasury Bill Termination'
+    message = f'The Treasury Bill with transaction code ({termination_instance.transaction_code}) and Account Number {termination_instance.account_number.account_number} has instructed {request.user.username} to terminate.'
+    recipient_list = ['Treasury@omnibsic.com.gh']  # Replace with the actual recipient's email
+    from_email = settings.DEFAULT_FROM_EMAIL 
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     
     # Create a Withdrawal instance
     withdrawal = Withdrawal(
@@ -176,12 +233,12 @@ def terminate_t_bill(request, slug):
     messages.success(request, 'Treasury Bill Terminated successfully!')
     return redirect('/branch/treasury-bill/')
 
-
+@login_required(login_url='/')
 def withdrawal_list(request):
     withdrawals = Withdrawal.objects.all()
     return render(request, 'branch/treasury/withdrawal-list.html', {'withdrawals': withdrawals})
 
-
+@login_required(login_url='/')
 def delete_treasury_bill(request, slug):
     # Retrieve the TreasuryBill instance based on the slug
     delete_instance = get_object_or_404(TreasuryBills, slug=slug)
@@ -189,7 +246,7 @@ def delete_treasury_bill(request, slug):
     messages.success(request, 'Treasury Bill deleted successfully!')
     return redirect('/branch/treasury-bill/')
 
-
+login_required(login_url='/')
 def get_treasury_bills_due_next_week():
     today = timezone.now().date()
     end_of_week = today + timedelta(weeks=1)
@@ -201,7 +258,7 @@ def get_treasury_bills_due_next_week():
     
     return due_next_week
 
-
+@login_required(login_url='/')
 def notify_treasury_bill(request):
     all_treasury_bills = get_treasury_bills_due_next_week()
     
@@ -212,7 +269,7 @@ def notify_treasury_bill(request):
     return render(request, 'branch/treasury/reinvest-treasury-bill.html', context)
 
 
-
+login_required(login_url='/')
 def treasury_bill(request):
     all_treasury_bills = TreasuryBills.objects.all()
     context = {
@@ -220,18 +277,16 @@ def treasury_bill(request):
     }
     return render(request, 'branch/treasury/requested-treasury-bill.html', context)
 
-    
+@login_required(login_url='/')    
 def all_transactions(request):
-    pending_t_bills = TreasuryBills.objects.all()
-    context = {
-        'pending_t_bills': pending_t_bills,
-    }
-    return render(request, 'branch/treasury/all-transactions.html', context)
+    transactions = TransactionDetails.objects.all()
+    return render(request, 'branch/treasury/all-transactions.html', {'transactions': transactions})
  
     
 
-
+@login_required(login_url='/')
 def new_customer(request):
+    all_branch = Branchs.objects.all()
     if request.method == 'POST':
         form = NewCustomerForm(request.POST, request.FILES)
         if form.is_valid():
@@ -251,11 +306,33 @@ def new_customer(request):
 
     context = {
         'form': form,
+        'all_branch': all_branch,
     }
     return render(request, 'branch/customers/new-customer.html', context)
 
 
-       
+@login_required(login_url='/')
+def edit_customer(request, slug):
+    customer = get_object_or_404(CustomerInformation, slug=slug)
+
+    if request.method == 'POST':
+        form = EditCustomerForm(request.POST, request.FILES, instance=customer)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Customer information has been updated successfully!')
+            return redirect('/branch/customers/all/')  # Redirect to a list view or details page after editing
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = EditCustomerForm(instance=customer)
+
+    return render(request, 'branch/customers/edit-customer.html', {
+        'form': form,
+        'customer': customer
+    })
+
+
+@login_required(login_url='/')       
 def customers_all(request):
     customers = CustomerInformation.objects.all()
     with_csd = CustomerInformation.objects.filter(csd_number__isnull=False)

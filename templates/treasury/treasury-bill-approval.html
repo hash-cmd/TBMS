@@ -1,3 +1,5 @@
+{% if request.user.department == 'treasury' %}
+
 {% load static %}
 {% load widget_tweaks %}
 
@@ -45,10 +47,7 @@
     {% include 'includes/header.html' %}
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
     {% include 'includes/side_nav.html' %}
-  </aside><!-- End Sidebar -->
 
   <main id="main" class="main">
 
@@ -56,7 +55,7 @@
       <h1>Treasury Bill</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Branch</a></li>
+          <li class="breadcrumb-item">Treasury</li>
           <li class="breadcrumb-item active">Treasury Bill</li>
           <li class="breadcrumb-item active">Bulk Approval</li>
         </ol>
@@ -74,8 +73,8 @@
                 <img id="filePreview" class="file-preview" src="" alt="File Preview">
             </div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-success">Submit</button>
+            <div class="text-start">
+                <button type="submit" class="btn btn-success">Approve</button>
             </div>
         </form>
       </div>
@@ -109,3 +108,6 @@
 </body>
 
 </html>
+
+
+{% endif %}

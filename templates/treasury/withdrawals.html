@@ -1,3 +1,6 @@
+
+{% if request.user.department == 'treasury' %}
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -14,10 +17,7 @@
     {% include 'includes/header.html' %}
   </header><!-- End Header -->
 
-  <!-- ======= Sidebar ======= -->
-  <aside id="sidebar" class="sidebar">
     {% include 'includes/side_nav.html' %}
-  </aside><!-- End Sidebar -->
 
   <main id="main" class="main p-3">
 
@@ -32,7 +32,7 @@
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
-        <div class="table-container p-3">
+        <div class="table-container p-3 shadow border border-1 border-dark rounded">
             {% for message in messages %}
                 <div class="alert alert-success p-2"><i class="bi bi-shield-exclamation"></i> {{ message }}</div>
             {% endfor %}
@@ -96,3 +96,6 @@
 </body>
 
 </html>
+
+
+{% endif %}

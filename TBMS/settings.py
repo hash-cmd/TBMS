@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+from celery.schedules import crontab
+from decouple import config
+import logging
+import logging.config
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6d=1v*9d-u*p08ws6ikg@5uk+w=gl8n6l_843t92sm+r3*#l1i'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -38,22 +45,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.microsoft',
-    
-    'django_select2',
-    'dal',
-    'dal_select2',
-    'widget_tweaks',
-    
-    'formtools',
+   
     'accounts',
     'branch',
     'treasury',
     'trops',
+
+    'allauth_ui',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.microsoft',
+    'widget_tweaks',
+    'slippers',
+    'django_select2',
+    'dal',
+    'dal_select2',
+    
 ]
 
 MIDDLEWARE = [
@@ -93,8 +101,15 @@ WSGI_APPLICATION = 'TBMS.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': config('DB_ENGINE'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT', default='1433'),  # Default port for SQL Server
+        'OPTIONS': {
+            'driver': config('DB_DRIVER'), # Optional for self-signed certificates
+        },
     }
 }
 
@@ -104,19 +119,23 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/home'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 SOCIALACCOUNT_PROVIDERS = {
     "microsoft": {
         "APPS": [
             {
-                "client_id": '3efeafcf-950d-4de2-a7e6-cc1a374b0398',
-                "secret": '6OX8Q~Upchz3pS2Jqsn9G2LH-1pPRdcSprKNScmy',
+                "client_id": config('MICROSOFT_CLIENT_ID', default=''),
+                "secret": config('MICROSOFT_SECRET', default=''),
                 'scope': [
-                'openid',
-                'profile',
-                'email',
-            ],
+                    'openid',
+                    'profile',
+                    'email',
+                ],
+                'AUTHENTICATE': False,
                 "settings": {
-                    "tenant": "organizations",
+                    "tenant": config('MICROSOFT_TENANT', default=''),
                 }
             }
         ]
@@ -158,18 +177,80 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static'
-]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static')
+# ]
 
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Celery configuration
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='')
+
+CELERY_BEAT_SCHEDULE = {
+    'check-database-every-minute': {
+        'task': 'treasury.tasks.check_database',
+        'schedule': crontab(minute='*/1'),  # Run every minute
+    },
+}
+
+# Email configuration
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.example.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='flexalert@omnibsic.com.gh')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # Keep Django’s default loggers
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG', 
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'all_logs.log'),
+            'formatter': 'verbose', 
+        },
+        'console': {
+            'level': 'DEBUG',  # Capture all levels for the console
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',  # Simple format for console logs
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',  # Capture all levels from DEBUG upwards
+            'propagate': True,  # Ensure logs propagate to parent loggers
+        },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',  # Capture all levels, including request-level logs
+            'propagate': False,  # Do not propagate to other loggers
+        },
+    },
+}

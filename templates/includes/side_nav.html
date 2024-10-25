@@ -1,173 +1,242 @@
 {% load static %}
 
-<ul class="sidebar-nav" id="sidebar-nav">
-	  <li class="nav-heading">Menu</li>
+<aside id="sidebar" class="sidebar" style="background-color: #1e293b;">
+    <ul class="sidebar-nav" id="sidebar-nav">
+        <li class="nav-heading">Menu</li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-grid-fill"></"></i><span>Dashboard</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          {% if request.user.department == 'branch' %}
-		  <li>
-            <a href="/branch/">
-              <i class="bi bi-circle"></i><span>Overview</span>
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-grid-fill"></i><span>Dashboard</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-          </li>
-		  {% elif request.user.department == 'treasury' %}
-		  <li>
-            <a href="/treasury/">
-              <i class="bi bi-circle"></i><span>Overview</span>
-            </a>
-          </li>
-		  {% elif request.user.department == 'trops' %}
-          <li>
-            <a href="components-accordion.html">
-              <i class="bi bi-circle"></i><span>Market Summary</span>
-            </a>
-          </li>
-		  {% endif %}   
-        </ul>
-      </li><!-- End Components Nav -->
-	  
-	  
+            <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                {% if request.user.department == 'branch' %}
+                <li>
+                    <a href="/branch/">
+                        <i class="bi bi-circle-fill"></i><span>Overview</span>
+                    </a>
+                </li>
+                {% elif request.user.department == 'treasury' %}
+                <li>
+                    <a href="/treasury/">
+                        <i class="bi bi-circle-fill"></i><span>Overview</span>
+                    </a>
+                </li>
+                {% elif request.user.department == 'trops' %}
+                <li>
+                    <a href="/trops/">
+                        <i class="bi bi-circle-fill"></i><span>Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="components-accordion.html">
+                        <i class="bi bi-circle-fill"></i><span>Market Summary</span>
+                    </a>
+                </li>
+                {% elif request.user.department == 'admin' %}
+                <li>
+                    <a href="/super/users/all/">
+                        <i class="bi bi-circle-fill"></i><span>User Manager</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
 
-		<li class="nav-heading">Treasury Bill Information</li>
+        
+        {% if request.user.department == 'branch' %}
+		<!-- Treasury Bill Information -->
+        <li class="nav-heading">Treasury Bill Information</li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-journal-text"></i><span>Treasury Bill</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/branch/treasury-bill/new/">
+                        <i class="bi bi-circle-fill"></i><span>Purchase Bills</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/branch/treasury-bill/">
+                        <i class="bi bi-circle-fill"></i><span>View Holdings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/branch/notify/">
+                        <i class="bi bi-circle-fill"></i><span>Reinvest</span>
+                    </a>
+                </li>
+                {% elif request.user.department == 'treasury' %}
+				<!-- Treasury Bill Information -->
+                <li class="nav-heading">Treasury Bill Information</li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-journal-text"></i><span>Treasury Bill</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                        <li>
+                            <a href="/treasury/treasury-bill/">
+                                <i class="bi bi-circle-fill"></i><span>View Holdings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/treasury/treasury-bill/bulk-approval/">
+                                <i class="bi bi-circle-fill"></i><span>Approve</span>
+                            </a>
+                        </li>
+                {% elif request.user.department == 'trops' %}
+				<!-- Treasury Bill Information -->
+        <li class="nav-heading">Treasury Bill Information</li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-journal-text"></i><span>Treasury Bill</span><i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <ul id="forms-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/trops/treasury-bill/">
+                        <i class="bi bi-circle-fill"></i><span>View Holdings</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/trops/treasury-bill/bulk-debit/">
+                        <i class="bi bi-circle-fill"></i><span>Confirm Debit</span>
+                    </a>
+                </li>
+				<li>
+                    <a href="#">
+                        <i class="bi bi-circle-fill"></i><span>Maturity Schedule</span>
+                    </a>
+                </li>
+                {% endif %}
+                
+            </ul>
+        </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-journal-text"></i><span>Treasury Bill</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-		{% if request.user.department == 'branch' %}
-          <li>
-            <a href="/branch/treasury-bill/new/">
-              <i class="bi bi-circle"></i><span>Purchase Bills</span>
+        <!-- Transactions for different departments -->
+        
+                {% if request.user.department == 'branch' %}
+				<li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-layout-text-window-reverse"></i><span>Transactions</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-          </li>
-		  <li>
-            <a href="/branch/treasury-bill/">
-              <i class="bi bi-circle"></i><span>View Holdings</span>
+            <ul id="tables-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/branch/all-transactions/">
+                        <i class="bi bi-circle-fill"></i><span>Transaction History</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/branch/treasury-bill/withdrawal-list/">
+                        <i class="bi bi-circle-fill"></i><span>Withdrawals</span>
+                    </a>
+                </li>
+                {% elif request.user.department == 'treasury' %}
+				<li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-layout-text-window-reverse"></i><span>Transactions</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-          </li>
-		   <li>
-            <a href="/branch/notify/">
-              <i class="bi bi-circle"></i><span>Reinvest</span>
+            <ul id="tables-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/treasury/all-transactions/">
+                        <i class="bi bi-circle-fill"></i><span>Transaction History</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/treasury/treasury-bill/withdrawals/">
+                        <i class="bi bi-circle-fill"></i><span>Withdrawals</span>
+                    </a>
+                </li>
+                {% elif request.user.department == 'trops' %}
+				<li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-layout-text-window-reverse"></i><span>Transactions</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-          </li>
-		 {% endif %}
-          
-		  {% if request.user.department == 'treasury' %}
-		  <li>
-            <a href="/treasury/treasury-bill/">
-              <i class="bi bi-circle"></i><span>View Holdings</span>
-            </a>
-          </li>
-		  <li>
-            <a href="/treasury/treasury-bill/bulk-approval/">
-              <i class="bi bi-circle"></i><span>Approve</span>
-            </a>
-          </li>
-		   <li>
-            <a href="">
-              <i class="bi bi-circle"></i><span>Reinvestment</span>
-            </a>
-          </li>
-		  {% endif %}
-         
-          <li>
-            <a href="">
-              <i class="bi bi-circle"></i><span>Maturity Schedule</span>
-            </a>
-          </li>
-        </ul>
-      </li><!-- End Forms Nav -->
+            <ul id="tables-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/trops/all-transactions/">
+                        <i class="bi bi-circle-fill"></i><span>Transaction History</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/treasury/treasury-bill/withdrawals/">
+                        <i class="bi bi-circle-fill"></i><span>Withdrawals</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-layout-text-window-reverse"></i><span>Transactions</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/branch/all-transactions/">
-              <i class="bi bi-circle"></i><span>Transaction History</span>
+        {% if request.user.department == 'branch' %}
+        <li class="nav-heading">Customer Information</li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-people-fill"></i><span>Customer Information</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-          </li>
-		  {% if request.user.department == 'branch' %}
-          <li>
-            <a href="/branch/treasury-bill/withdrawal-list/">
-              <i class="bi bi-circle"></i><span>Withdrawals</span>
-            </a>
-          </li>
-		  {% elif request.user.department == 'treasury' %}
-		  <li>
-            <a href="/treasury/treasury-bill/withdrawals/">
-              <i class="bi bi-circle"></i><span>Withdrawals</span>
-            </a>
-          </li>
-		  {% endif %}
-        </ul>
-      </li><!-- End Tables Nav -->
+            <ul id="charts-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/branch/customer/new/">
+                        <i class="bi bi-plus fs-5"></i><span>New Customer</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/branch/customers/all/">
+                        <i class="bi bi-person-fill fs-6"></i><span>All Customers</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        {% elif request.user.department == 'trops' %}
+			  <li class="nav-heading">Customer Information</li>
+				<li class="nav-item">
+					<a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+						<i class="bi bi-people-fill"></i><span>Customer Information</span><i class="bi bi-chevron-down ms-auto"></i>
+					</a>
+					<ul id="charts-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+						
+						<li>
+							<a href="/trops/customers/all/">
+								<i class="bi bi-person-fill fs-6"></i><span>All Customers</span>
+							</a>
+						</li>
+					</ul>
+				</li>
+                
+				<li class="nav-item">
+					<a class="nav-link collapsed"  href="/trops/treasury-bill/code/">
+						<i class=""></i><span>Weekly BOG Code</span>
+					</a>
+					
+				</li>
+		{% endif %}
 
-		 {% if request.user.department == 'branch' %}
-		<li class="nav-heading">Customer Information</li>
-	  
-	   <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-people-fill"></i><span>Customer Information</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/branch/customer/new/">
-              <i class="bi bi-plus fs-5"></i><span>New Customer</span>
+        {% if request.user.department == 'treasury' %}
+        <li class="nav-heading">Others Information</li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
+                <i class="bi bi-gem"></i><span>Others</span><i class="bi bi-chevron-down ms-auto"></i>
             </a>
-          </li>
-          <li>
-            <a href="/branch/customers/all/">
-              <i class="bi bi-person-fill fs-6"></i><span>All Customers</span>
+            <ul id="icons-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                <li>
+                    <a href="/treasury/branch/">
+                        <i class="bi bi-circle-fill"></i><span>Branch</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/treasury/currency/">
+                        <i class="bi bi-circle-fill"></i><span>Currency</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        {% endif %}
+
+         <li class="nav-item ">
+            <a class="text-danger nav-link collapsed" href="{% url 'account_logout' %}">
+                <i class="text-light bi bi-power"></i>
+                <span>Logout</span>
             </a>
-          </li>
-        </ul>
-      </li><!-- End Charts Nav -->
-	   {% endif %}
-	  
-	  {% if request.user.department == 'treasury' %}
-	  <li class="nav-heading">Others Information</li>
+        </li><!-- End Contact Page Nav -->
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-gem"></i><span>Others</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="icons-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/treasury/branch/">
-              <i class="bi bi-circle"></i><span>Branch</span>
-            </a>
-          </li>
-          <li>
-            <a href="/treasury/currency/">
-              <i class="bi bi-circle"></i><span>Currency</span>
-            </a>
-          </li>
-          
-        </ul>
-      </li><!-- End Icons Nav -->
-	{% endif %}
-
-      <li class="nav-heading">Settings</li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="users-profile.html">
-          <i class="bi bi-person"></i>
-          <span>Profile Settings</span>
-        </a>
-      </li><!-- End Profile Page Nav -->
-
-      <li class="nav-item ">
-        <a class="text-danger nav-link collapsed" href="pages-contact.html">
-          <i class="bi bi-power"></i>
-          <span>Logout</span>
-        </a>
-      </li><!-- End Contact Page Nav -->
 
     </ul>
+</aside>
